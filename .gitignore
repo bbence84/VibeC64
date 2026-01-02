@@ -9,3 +9,5 @@ output/
 .vscode/
 .files/
 tests/
+.python-version
+Procfile
