@@ -227,6 +227,7 @@ class ChainlitMiddlewareTracer(AgentMiddleware if AgentMiddleware != object else
         task_list.status = "Running..."
         cl.user_session.set("task_list", task_list)
         
+        
         # Add todos to table
         for idx, todo in enumerate(todos, 1):
             status = todo.get("status", "not_started")
@@ -254,6 +255,7 @@ class ChainlitMiddlewareTracer(AgentMiddleware if AgentMiddleware != object else
             await task_list.add_task(task)       
 
         await task_list.send()     
+        cl.user_session.set("task_list_completed", False)
         
         return "\n".join(lines)
 

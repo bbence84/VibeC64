@@ -8,8 +8,8 @@ logger = logging.getLogger(__name__)
 # load_dotenv()
 
 class LLMAccessProvider:
-    def __init__(self, llm_model=None):
-        self.llm_model = llm_model
+    def __init__(self):
+        pass
     
     def _map_model_name(self, model_name, use_openrouter=False):
         # Map the following to model IDs from the providers

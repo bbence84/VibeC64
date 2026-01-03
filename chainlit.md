@@ -17,13 +17,14 @@ C64Vibe is an intelligent AI agent that helps you bring your retro gaming ideas 
 
 Getting started is simple - just describe what you want to create in plain English!
 
-### Example Requests:
+### Example Requests
 
 - *"Make a text adventure game set in a haunted castle"*
 - *"Create a simple space shooter game where the player shoots asteroids"*
 - *"Generate a maze game with collectible items"*
+- *"A snake game where you have to catch a flashing heart"*
 
-### The Agent Will:
+### The Agent Will
 
 1. **Design** - Create a detailed game plan based on your description
 2. **Code** - Generate complete C64 BASIC V2.0 source code
@@ -31,7 +32,13 @@ Getting started is simple - just describe what you want to create in plain Engli
 4. **Test** - Optionally run the game on real hardware (if connected)
 5. **Deliver** - Provide downloadable .BAS and .PRG files, open it in an emulator
 
-### Hardware Support:
+### Troubleshooting a Generated Program
+
+If you are still in the same session that generated the original game, you only need to describe the error to the AI agent and it will try to fix the issue. Additionally, you can also upload a screenshot which the agent will process and use for troubleshooting. It's sometimes sufficient to attach just the screenshot (or photo) showing the error.
+
+If you are in a new session and you still have the original BAS source code file, you can upload that in a new session and ask the AI agent to troubleshoot it.
+
+### Hardware Support
 
 C64Vibe works with or without physical hardware:
 

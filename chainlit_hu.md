@@ -23,13 +23,19 @@ A kezdés egyszerű – csak írd le (egyelőre angolul a legbiztosabb, de magya
 - *"Create a simple space shooter game where the player shoots asteroids"* (Készíts egy egyszerű űrlövöldözős játékot, ahol a játékos aszteroidákat lő)
 - *"Generate a maze game with collectible items"* (Generálj egy labirintusjátékot gyűjthető tárgyakkal)
 
-### Az ágens folyamata:
+### Az program létrehozás folyamata:
 
 1. **Tervezés** – Részletes játéktervet készít a leírásod alapján.
 2. **Kódolás** – Legenerálja a teljes C64 BASIC V2.0 forráskódot.
 3. **Validálás** – Ellenőrzi a szintaktikai hibákat és automatikusan javítja őket.
 4. **Indítás** – Lefuttatja a játékot valódi hardveren (ha csatlakoztatva van).
 5. **Kipróbálás** – Letölthető .BAS és .PRG fájlokat biztosít, vagy megnyitja a játékot az emulátorban.
+
+### Hibakeresés egy generált programban
+
+Ha még mindig ugyanabban a munkamenetben vagy, amelyben az eredeti játék készült, csak írd le a hibát az AI asszisztensnek, és megpróbálja kijavítani a problémát. Ezen kívül feltölthetsz egy képernyőképet is, amelyet az asszisztens feldolgoz és felhasznál a hibaelhárításhoz. Néha elegendő csak a hibát mutató képernyőképet (vagy fotót) csatolni.
+
+Ha új munkamenetben vagy, de megvan az eredeti BAS forráskód fájl, feltöltheted azt egy új munkamenetben, és megkérheted az AI asszisztenst, hogy végezzen hibaelhárítást.
 
 ### Hardvertámogatás:
 
@@ -38,9 +44,9 @@ A C64Vibe fizikai hardverrel és anélkül is használható:
 - ✅ **Csak szoftver** – C64 programok generálása és letöltése emulátorban való futtatáshoz.
 - ✅ **Hardverrel** – KungFu Flash, C64 billentyűzet és videó input eszköz csatlakoztatása a teljes hardveres integrációhoz. Hamarosan Commodore 64 Ultimate támogatás is elérhető lesz.
 
-### MI LLM modell szolgáltató API kulcs beszerzése
+### AI LLM modell szolgáltató API kulcs beszerzése
 
-Az alkalmazás használatához regisztrálnod kell egy MI modell szolgáltatónál (Google, OpenAI), vagy az OpenRouteren keresztül. Az OpenRouter lehetővé teszi több különböző szolgáltató MI modelljének használatát egyetlen API kulccsal.
+Az alkalmazás használatához regisztrálnod kell egy AI modell szolgáltatónál (Google, OpenAI), vagy az OpenRouteren keresztül. Az OpenRouter lehetővé teszi több különböző szolgáltató AI modelljének használatát egyetlen API kulccsal.
 
 [Szerezz egy API kulcsot](https://openrouter.ai/settings/keys) regisztráció és [egyenlegfeltöltés](https://openrouter.ai/settings/credits) után. Közvetlenül is beszerezhetsz API kulcsokat, például a [Google AI Studio](https://aistudio.google.com/app/api-keys) felületén. Itt van ingyenes keret is, de az meglehetősen korlátozott, így a számlázás bekapcsolása szükséges, hogy megfelelően működjön az eszköz.
 

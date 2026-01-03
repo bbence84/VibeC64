@@ -31,6 +31,7 @@ latex = false
 
 # Autoscroll new user messages at the top of the window
 user_message_autoscroll = true
+# assistant_message_autoscroll = false
 
 # Automatically tag threads with the current chat profile (if a chat profile is used)
 auto_tag_thread = true
@@ -90,7 +91,7 @@ name = "C64Vibe"
 
 github="https://github.com/bbence84/c64vibe/"
 
-# default_theme = "dark"
+default_theme = "light"
 
 # Force a specific language for all users (e.g., "en-US", "he-IL", "fr-FR")
 # If not set, the browser's language will be used

@@ -58,17 +58,16 @@ async def on_chat_start():
     cl.user_session.set("llm_access_provider", LLMAccessProvider())
     cl.user_session.set("hw_access_tools", HWAccessTools())
     
-    logger.info("Loading AI model from environment variables...")
-
+    await display_welcome_message()
+    
+    logger.info("Loading AI model from environment variables if available...")
     load_ai_model_from_env()
 
     await init_settings()
-    await display_welcome_message()
-
-    global set_model_settings_alert_msg
-
+    
     if cl.user_session.get("model_init_success") is not True:
         set_model_settings_alert_msg = await cl.Message(content=set_model_settings_alert).send()
+        cl.user_session.set("set_model_settings_alert_msg", set_model_settings_alert_msg)
         return
     
     await initialize_agent()
@@ -90,8 +89,9 @@ async def initialize_agent():
     Use the various tools at your disposal to create, test, and run C64 BASIC V2.0 games.
     When given a user request, first determine if it involves creating or modifying a C64 BASIC V2.0 game.
 
+    Right at the beginning of the game creation or modification process, emit a short statement that the process has been started and mention the initial steps you will take.
+
     Tool use instructions:
-    - Before starting the creation or modification process, state that the process has been started and mention the initial steps you will take.
     - If code creation or modification is needed, first use the DesignGamePlan tool to create a detailed game design plan 
     - Use the CreateUpdateC64BasicCode tool to generate syntactically correct code based on the design plan created by DesignGamePlan. Don't specify code in the description, only the design plan.
        - The CreateUpdateC64BasicCode tool should recieve all the details from the game design plan, how the code should be generated, what features to include etc.
@@ -101,10 +101,13 @@ async def initialize_agent():
     {"- If at any point you need to restart the C64 hardware, use the RestartC64 tool." if hw_access_tools.is_c64keyboard_connected() else ""}
     {"- Use the CaptureC64Screen tool to capture the current screen of the C64 and analyze what is displayed, i.e to verify if the program started and looks good." if hw_access_tools.is_capture_device_connected() else ""}
     - No need to persist and edit the source code during the creation process, as the agent has external memory to store the current source code.
-    - At the end of the process, don't provide links to the PRG or BASE files, just state that the files are ready for download.
+    
+    At the end of the process, don't provide links to the PRG or BASE files, just state that the files are ready for download.
     Throughout the process, make use of the write_todos tool to keep track of your tasks and ensure all steps are completed systematically.
     Communicate with the user in English, even if the game itself is to be created in another language.
     At the end of the tasks, update the todo list with write_todos to mark all tasks as completed.
+
+
     """
 
     program_path = os.path.abspath(f"output")
@@ -151,8 +154,7 @@ async def display_welcome_message():
     
     hardware_info = "\n".join(hardware_status) if hardware_status else "- No Commodore 64 hardware connected - you can still create and test programs in an emulator or download the programs and run them manually on real hardware."
     register_llm_provider_text = ""
-    if cl.user_session.get("model_init_success") is not True:
-        register_llm_provider_text = f"""
+    register_llm_provider_text = f"""
 ### Getting an AI Model Provider API Key
 In order to use this app, you need to register an AI model provider account through either OpenRouter or directly with the vendor. OpenRouter allows you to use multiple AI models from different providers with a single API key. 
 [Get an API key](https://openrouter.ai/settings/keys) after registration and [adding credits](https://openrouter.ai/settings/credits). You can also get API keys directly, i.e. in [Google AI Studio](https://aistudio.google.com/app/api-keys). There's free quota, but it's pretty limited, so you also need to enable billing. For best experience and cost efficiency, we recommend using the **Google Gemini 3.0 Flash Preview model**.
@@ -164,15 +166,16 @@ Welcome to **C64Vibe**, your AI assistant for creating Commodore 64 BASIC V2.0 g
 
 I can help you:
 - Design and create C64 BASIC V2.0 games
-- Check syntax and fix errors
+- Check syntax and fix errors (even after creating the game)
 - Run programs on real hardware (if connected) or in an emulator
 ### Hardware Status
 {hardware_info}
 
 {register_llm_provider_text}
 """
-    global welcome_msg
     welcome_msg = await cl.Message(content=welcome_message).send()
+    cl.user_session.set("welcome_msg", welcome_msg)
+    
 
 def load_ai_model_from_env():
     model_provider = os.getenv("AI_MODEL_PROVIDER")
@@ -223,19 +226,21 @@ async def on_settings_update(settings):
 @cl.on_message
 async def on_message(message: cl.Message):
 
-    global welcome_msg
-    await welcome_msg.remove()
-    global set_model_settings_alert_msg
+    welcome_msg = cl.user_session.get("welcome_msg")
+    if welcome_msg is not None:
+        await welcome_msg.remove()
+    set_model_settings_alert_msg = cl.user_session.get("set_model_settings_alert_msg") 
 
     if cl.user_session.get("model_init_success") is not True:
-        await message.remove()
-        if 'set_model_settings_alert_msg' in globals():
-            await set_model_settings_alert_msg.remove()
+        if set_model_settings_alert_msg is not None:
+            await set_model_settings_alert_msg.remove() 
         set_model_settings_alert_msg = await cl.Message(content=set_model_settings_alert).send()
+        cl.user_session.set("set_model_settings_alert_msg", set_model_settings_alert_msg)
         return
 
     agent = cl.user_session.get("agent")
     thread_id = cl.user_session.get("thread_id") 
+    
 
     agent_config = {"configurable": {"thread_id": thread_id}, "recursion_limit": 50}
 
@@ -261,11 +266,12 @@ async def on_message(message: cl.Message):
                 await msg.stream_token(token.text)
 
     await msg.update()
+
     task_list = cl.user_session.get("task_list")
     if task_list is not None:
         task_list.status = "Done"
         await task_list.send()
-        #cl.user_session.set("task_list", None)
+        cl.user_session.set("task_list_completed", True)
 
 def get_messages_from_attachments(message: cl.Message):
     additional_messages = []
@@ -308,26 +314,28 @@ async def change_agent_settings(settings):
 
     if llm_access_provider and llm_model and api_key:
 
-        global set_model_settings_alert_msg
-
         set_llm_success = llm_access_provider.set_llm_model(model_name=llm_model, api_key=api_key, use_openrouter=use_openrouter)
         if not set_llm_success:
 
             cl.user_session.set("model_init_success", False)
             model_init_failure_alert = set_model_settings_alert + '<br>❌<span style="color:red"> **Error initializing the selected model. Please check your API key and model selection.**</span>'
-            if 'set_model_settings_alert_msg' not in globals() or set_model_settings_alert_msg is None:
+            set_model_settings_alert_msg = cl.user_session.get("set_model_settings_alert_msg") 
+            if set_model_settings_alert_msg is None:
                 set_model_settings_alert_msg = await cl.Message(content=model_init_failure_alert).send()
+                cl.user_session.set("set_model_settings_alert_msg", set_model_settings_alert_msg)
             else:
                 set_model_settings_alert_msg.content = model_init_failure_alert
                 await set_model_settings_alert_msg.update()
+                cl.user_session.set("set_model_settings_alert_msg", set_model_settings_alert_msg)
 
             return
         
         cl.user_session.set("llm_access_provider", llm_access_provider)
         cl.user_session.set("model_init_success", True)
         await initialize_agent()
-        
-        if 'set_model_settings_alert_msg' in globals():
+            
+        set_model_settings_alert_msg = cl.user_session.get("set_model_settings_alert_msg") 
+        if set_model_settings_alert_msg is not None:
             await set_model_settings_alert_msg.remove()
             set_model_settings_alert_msg = None    
 

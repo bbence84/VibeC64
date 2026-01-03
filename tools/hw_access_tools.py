@@ -28,7 +28,10 @@ class HWAccessTools:
 
     def _init_c64_keyboard(self):
         try:
-            keyboard_port = os.getenv("C64_KEYBOARD_DEVICE_PORT", "COM3")
+            keyboard_port = os.getenv("C64_KEYBOARD_DEVICE_PORT")
+            if keyboard_port is None or keyboard_port.strip() == "":
+                self.c64keyboard_connected = False
+                return
             self.c64keyboard = C64HardwareAccess(device_port=keyboard_port, baud_rate=19200, debug=False)
             self.c64keyboard_connected = True
         except Exception as e:
@@ -37,7 +40,10 @@ class HWAccessTools:
 
     def _init_kungfu_flash(self):
         try:
-            kungfu_flash_port = os.getenv("KUNGFU_FLASH_PORT", "COM4")
+            kungfu_flash_port = os.getenv("KUNGFU_FLASH_PORT")
+            if kungfu_flash_port is None or kungfu_flash_port.strip() == "":
+                self.kungfuflash_connected = False
+                return
             self.kungfuflash = KungFuFlashUSB(port=kungfu_flash_port)
             self.kungfuflash_connected = True
         except Exception as e:
