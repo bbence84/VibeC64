@@ -1,26 +1,29 @@
-# 🎮 VibeC64 - AI-Powered Commodore 64 Game Creator
+# VibeC64 - AI-Powered Commodore 64 Game Creator
 
-VibeC64 is an AI agent specialized in creating games for the Commodore 64 computer using BASIC V2.0. It leverages modern AI models to design, code, test, and optionally run C64 programs on real hardware or emulators.
+![VibeC64 Logo](public/logo.png)
 
-**Created by Bence Blaske - 2025**
+VibeC64 is an AI agent specialized in creating games for the Commodore 64 computer using BASIC V2.0. It leverages modern AI models (LLMs) to design, code, test, and optionally run C64 programs on real hardware or emulators.
+
+**Created by Bence Blaske - 2026**
 
 ## ✨ Features
 
-- **AI-Powered Game Design**: Uses advanced LLMs (Google Gemini, Anthropic Claude, OpenAI GPT) to create complete game designs
+- **AI-Powered Game Design**: Create complete game designs based on an idea
 - **Automatic Code Generation**: Generates syntactically correct C64 BASIC V2.0 code
 - **Syntax Checking**: Built-in LLM-based and rule-based syntax validation
 - **Hardware Integration**: Optional support for real C64 hardware via:
-  - KungFu Flash USB device for program loading
-  - C64 keyboard control
+  - C64U support coming soon (using its REST APIs)
+  - KungFu Flash USB device for program loading (requires modified firmware)
+  - Direct C64 keyboard control via a custom built device
   - Video capture for screen analysis
-- **Dual Interface**: 
-  - **Web UI** (Chainlit): User-friendly web interface with file downloads and emulator integration
+- **Dual User Interfaces**: 
+  - **Web UI**: User-friendly web interface with file upload and download and emulator integration
   - **CLI**: Terminal-based interface for command-line enthusiasts
 - **Multiple LLM Providers**: Support for Google AI, Anthropic, OpenAI, and OpenRouter
 
-## 📋 Requirements
+## 📋 Requirements 
 
-- Python 3.12+
+- Python 3.12+ (when running locally)
 - API key from one of the supported AI providers:
   - Google AI Studio
   - Anthropic
@@ -29,8 +32,9 @@ VibeC64 is an AI agent specialized in creating games for the Commodore 64 comput
 
 ### Optional Hardware
 - KungFu Flash USB device, with modified firmware (for loading programs on real C64)
-- USB keyboard interface for C64
-- Video capture device (for screen capture analysis)
+- C64U support coming soon (using its REST APIs)
+- USB keyboard interface for C64 (custom built, details coming soon)
+- Video capture device (for screen capture analysis, optional)
 
 ## 🚀 Installation
 
@@ -60,8 +64,7 @@ API_KEY=your_api_key_here
 LANGCHAIN_TRACING_V2=false
 LANGCHAIN_API_KEY=your_langsmith_key_here
 ```
-Possible AI providers: anthropic, openai, azure_openai, google_genai, openrouter
-For OpenRouter, use the model name with the prefix as shown on the OpenRouter model page, i.e. google/gemini-3-flash-preview
+Possible AI providers: anthropic, openai, azure_openai, google_genai, openrouter. When using OpenRouter, specify the model name with the prefix as shown on the OpenRouter model page, i.e. google/gemini-3-flash-preview
 
 ## 🎯 Usage
 
@@ -72,7 +75,7 @@ chainlit run main.py
 ```
 
 The web interface will open at `http://localhost:8000`. You can:
-- Set your AI model and API key in the settings panel (⚙️ icon)
+- Set your AI model and API key in the settings panel (⚙️ icon) - if you haven't specified them in the .env file
 - Chat with the agent to create C64 games
 - Download generated `.bas` and `.prg` files
 - Launch programs directly in an online C64 emulator
@@ -91,7 +94,7 @@ The CLI provides a terminal-based interface with rich formatting and markdown su
 VibeC64/
 │
 ├── main.py           # Main Chainlit web interface
-├── vibec46_cli.py          # Command-line interface
+├── vibec64_cli.py          # Command-line interface
 ├── chainlit.md             # Chainlit welcome message
 ├── requirements.txt        # Python dependencies
 ├── env_template            # Environment variables template
@@ -136,28 +139,11 @@ VibeC64/
 
 ### Architecture Overview
 
-VibeC64 is built on the **LangChain** framework for agent orchestration. The web interface uses **Chainlit** for a modern, interactive chat experience.
+VibeC64 is built on the **LangChain** AI agent framework for orchestration. The web interface uses **Chainlit** for a modern, interactive chat experience.
 
 ### Core Components
 
-#### 1. Agent State Management (`tools/agent_state.py`)
-
-The agent maintains state across interactions, storing the current C64 BASIC source code and any syntax errors detected. This allows the agent to:
-- Iteratively refine code without losing context
-- Track syntax errors across checking cycles
-- Maintain conversation history and todo lists
-
-#### 2. LLM Access Layer (`utils/llm_access.py`)
-
-The `LLMAccessProvider` class provides a unified interface to multiple AI providers:
-
-- **Model Mapping**: Translates user-friendly model names to provider-specific identifiers
-- **Provider Support**: Google AI, Anthropic, OpenAI, and OpenRouter
-- **Dynamic Initialization**: Allows runtime model switching without restart
-- **API Key Management**: Securely handles credentials for different providers
-
-
-#### 3. Agent Tools
+#### 1. Agent Tools
 
 The agent has access to three main tool categories:
 
@@ -187,15 +173,31 @@ The code generation process:
 - **RestartC64**: Resets the C64 hardware
 - **TypeOnC64**: Sends keyboard input to C64
 
+#### 2. Agent State Management (`tools/agent_state.py`)
+
+The agent maintains state across interactions, storing the current C64 BASIC source code and any syntax errors detected. This allows the agent to:
+- Iteratively refine code without losing context
+- Track syntax errors across checking cycles
+- Maintain conversation history and todo lists
+
+#### 3. LLM Access Layer (`utils/llm_access.py`)
+
+The `LLMAccessProvider` class provides a unified interface to multiple AI providers:
+
+- **Model Mapping**: Translates user-friendly model names to provider-specific identifiers
+- **Provider Support**: Google AI, Anthropic, OpenAI, and OpenRouter
+- **Dynamic Initialization**: Allows runtime model switching without restart
+- **API Key Management**: Securely handles credentials for different providers
+
 #### 4. Web Interface Flow (`main.py`)
 
 The web interface starts by setting up the AI connection, checking if C64 hardware is connected, and displaying a welcome message. It then creates the agent with access to code generation tools, testing tools, and file management capabilities.
 
-When a user sends a message, the agent processes it and streams the response back word-by-word for a natural chat experience. Users can change their AI model or API key at any time through the settings panel without needing to restart the application.
+When a user sends a message, the agent processes it and streams the response back for a natural chat experience. Users can change their AI model or API key at any time through the settings panel without needing to restart the application.
 
 #### 5. Middleware Stack
 
-The agent uses three key middleware layers:
+The agent uses three middleware layers:
 
 1. **TodoListMiddleware**: Tracks agent's task progress
    - Breaks down complex requests into steps
@@ -205,7 +207,6 @@ The agent uses three key middleware layers:
 2. **FilesystemMiddleware**: Manages file operations
    - Provides filesystem tools to agent
    - Handles file reading, writing, listing
-   - Used for loading example programs
 
 3. **ChainlitMiddlewareTracer**: Integrates with UI
    - Captures tool calls and displays them in chat
@@ -239,10 +240,9 @@ graph TD
 When C64 hardware is available:
 
 - **KungFu Flash**: USB device that allows loading programs directly
+- **Commodore 64 Ultimate**: coming soon! Will support sending programs directly to the Commodore 64 Ultimate via its REST APIs
 - **C64 Keyboard**: Serial interface for sending keystrokes
 - **Capture Device**: Video capture for screen analysis via OpenCV
-
-The agent dynamically adjusts its system prompt based on hardware availability, enabling or disabling relevant tools.
 
 #### 8. Error Handling & Validation
 
@@ -255,7 +255,7 @@ Multi-layered validation ensures code quality:
 
 ### Example Interaction Flow
 
-1. User: "Create a simple maze game"
+1. User: "Create a simple snake game"
 2. Agent: Uses DesignGamePlan to create detailed design
 3. Agent: Uses CreateUpdateC64BasicCode with full design plan
 4. Agent: Stores code in `current_source_code` state
@@ -287,9 +287,9 @@ These examples are used by the LLM as few-shot examples for better syntax follow
 - **OpenAI**: [platform.openai.com/api-keys](https://platform.openai.com/api-keys)
 
 ### Recommended Models
-- **Best Performance**: Google Gemini 3.0 Flash Preview (fast & cost-effective)
-- **Highest Quality**: Anthropic Claude 4.5 Sonnet (slower but potentially more capable)
-- **Alternative**: OpenAI GPT-5.2 (balanced performance)
+- **Best Price / Performance**: Google Gemini 3.0 Flash Preview (fast & cost-effective)
+- **Highest Quality**: Anthropic Claude 4.5 Sonnet or Google Gemini 3.0 Pro (slower but potentially more capable)
+- **Alternative**: OpenAI GPT-5.2
 
 ## 🐛 Troubleshooting
 
@@ -300,13 +300,12 @@ These examples are used by the LLM as few-shot examples for better syntax follow
 
 ### Hardware Connection Issues
 - Check USB connections for KungFu Flash and capture device
-- Ensure C64 is powered on and KungFu Flash is properly initialized
-- Run hardware tests in `tests/` folder to diagnose issues
+- Ensure C64 is powered on and KungFu Flash is properly initialized, and the correct firmware is uploaded (details coming soon)
 
 ### Code Generation Issues
 - Be specific in your game descriptions
 - Provide clear requirements and constraints
-- Use the fix/modify feature if initial generation needs improvement
+- Use the fix/modify feature if initial generation needs improvement (either specify the error in text and/or upload a screenshot)
 
 ## 📝 Development Status
 
@@ -320,12 +319,14 @@ These examples are used by the LLM as few-shot examples for better syntax follow
 - ✅ File download and emulator links
 
 ### Planned Features
-- 🔄 Enhanced error handling and logging
-- 🔄 Test case generation and execution
+- 🔄 More BASIC V2 game examples for demonstrating more complex games
+- 🔄 Commodore 64 Ultimate REST API support
 - 🔄 Sprite and graphic asset generation using generative AI
 - 🔄 Sound effect and music generation tools
 - 🔄 User registration and conversation persistency
 - 🔄 Multi-language UI support
+- 🔄 Test case generation and execution for the created game
+
 
 ## 🤝 Contributing
 
@@ -343,4 +344,4 @@ MIT
 
 ---
 
-**Note**: This is a beta release. Some features may be experimental or incomplete. Hardware integration requires specific USB devices and is optional for using the emulator-based features.
+**Note**: This is a beta release. Some features may be experimental or incomplete, bugs might occur. Hardware integration requires specific USB devices and is optional for using the emulator-based features.
