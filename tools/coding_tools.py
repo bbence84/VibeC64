@@ -17,10 +17,11 @@ from chainlit.utils import utc_now
 LOAD_EXAMPLE_PROGRAMS = True
 
 class CodingTools:
-    def __init__(self, llm_access, cl = None):
+    def __init__(self, llm_access, cl = None, hw_access_tools = None):
         self.model_coder = llm_access.get_llm_model(create_new=True, streaming=False)
         self.llm_access = llm_access
         self.cl = cl
+        self.hw_access_tools = hw_access_tools
 
     def tools(self):
 
@@ -29,6 +30,7 @@ class CodingTools:
             runtime: ToolRuntime[None, VibeC64AgentState],
             source_code: Annotated[str, "C64 BASIC V2.0 source code to store in the agent's external memory."]
             ) -> Command:
+
             return Command(update={
                 "current_source_code": source_code,
                 "messages": [ToolMessage(content=f"Stored provided source code in the agent's external memory.", tool_call_id=runtime.tool_call_id)]
@@ -113,6 +115,7 @@ class CodingTools:
         load_examples = LOAD_EXAMPLE_PROGRAMS
 
         if change_instructions != "":
+
             original_code = runtime.state.get("current_source_code", "")
 
             code_create_instructions_1 = f"""
@@ -137,6 +140,11 @@ class CodingTools:
                 Make sure the code is ready to run on a real Commodore 64 computer without syntax errors.
                 
                 The game can be long and complex, so make sure to include all necessary parts to make it fully functional.
+
+                Always add the following lines at the END of the program to state that the program has been created by the VibeC64 AI agent:
+                63997 REM ==============================      
+                63998 REM CREATED USING VIBEC64
+                63999 REM GITHUB.COM/BBENCE84/VIBEC64
                 """    
             
         code_create_instructions = f"""
@@ -145,7 +153,7 @@ class CodingTools:
             Make sure line numbers are included and correctly ordered, and there's no duplicate line numbers.
             Provide only the source code as output, nothing else.
             C64 BASIC V2.0 has the following rules:
-            - Maximum 80 characters per line
+            - Maximum 80 characters per line, split into 2 lines (40 characters each)
             - Line numbers must be between 1 and 63999
             - Line numbers must be in increments of 10
             - Only use commands and functions available in C64 BASIC V2.0
@@ -170,6 +178,7 @@ class CodingTools:
             )
 
         source_code = agent_utils.get_message_content(llm_coder_response.content)
+
         return Command(update={
             "current_source_code": source_code,
             "messages": [ToolMessage(content=f"Created source code based on design or change instructions and persisted it in the external memory. ", tool_call_id=runtime.tool_call_id)]
@@ -191,7 +200,6 @@ class CodingTools:
             """
         llm_coder_response = self.model_coder.invoke([{"role": "user", "content": fix_instructions}])
         fixed_source_code = agent_utils.get_message_content(llm_coder_response.content)
-        
         
         return Command(update={
             "current_source_code": fixed_source_code,
@@ -219,12 +227,24 @@ class CodingTools:
             prg_base64 = base64.b64encode(prg_data).decode()
             props = { "button_label": "🎮 Launch Game in Online C64 Emulator",
                     "target_origin": "http://ty64.krissz.hu",
-                    "prg_binary_base64": prg_base64,}        
+                    "prg_binary_base64": prg_base64,}     
 
-            emulator_link = self.cl.CustomElement(name="EmulatorLink", props=props)
+            settings = {
+                    "showEmulatorButton": True,
+                    "button_label_emulator": "🎮 Launch Game in Online C64 Emulator",
+                    "target_origin": "http://ty64.krissz.hu",
+                    "prg_binary_base64": prg_base64,
+                    "basic_source_code": source_code,
+                    "showC64UButton": self.hw_access_tools.is_c64u_api_connected() if self.hw_access_tools else False,
+                    "button_label_c64u": "🚀 Run program in Commodore 64 Ultimate",
+                    "showKungFuButton": self.hw_access_tools.is_kungfuflash_connected() if self.hw_access_tools else False,
+                    "button_label_kungfu": "🥋 Run program using KungFu Flash"
+                    }               
+
+            run_program_buttons = self.cl.CustomElement(name="RunProgramButtons", props=settings)
 
             elements = [
-                emulator_link,
+                run_program_buttons,
                 self.cl.File(
                     name=f"{game_name}_{current_timestamp}.bas",
                     content=source_code,

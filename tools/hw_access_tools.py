@@ -1,10 +1,13 @@
 import os
 import time
 import logging
+import asyncio
 from typing_extensions import runtime
 
 from utils.c64_hw import C64HardwareAccess
 from utils.kungfuflash_usb import KungFuFlashUSB
+from utils.c64u_api import C64UApiClient
+
 import utils.agent_utils as agent_utils
 from tools.agent_state import VibeC64AgentState
 from langchain.tools import tool, ToolRuntime
@@ -15,6 +18,7 @@ class HWAccessTools:
     def __init__(self):
         self._init_kungfu_flash()
         self._init_c64_keyboard()
+        self._init_c64u_api()
         self.capture_device_connected = False
 
     def is_capture_device_connected(self):
@@ -25,6 +29,26 @@ class HWAccessTools:
 
     def is_kungfuflash_connected(self):
         return self.kungfuflash_connected
+
+    def is_c64u_api_connected(self):
+        return self.c64u_api_connected
+    
+    def _init_c64u_api(self):
+        try:
+            self.c64u_api_base = os.getenv("C64U_API_BASE_URL")
+            if self.c64u_api_base is None or self.c64u_api_base.strip() == "":
+                self.c64u_api_connected = False
+                return
+
+            async def check_api():
+                async with C64UApiClient(self.c64u_api_base) as api:
+                    is_connected = await api.check_c64_api()
+                    return is_connected
+
+            self.c64u_api_connected = asyncio.run(check_api())
+        except Exception as e:
+            logger.warning(f"Could not connect to C64U API at {self.c64u_api_base}. Continuing without C64U API access.")
+            self.c64u_api_connected = False
 
     def _init_c64_keyboard(self):
         try:
@@ -54,7 +78,13 @@ class HWAccessTools:
 
         @tool("RunC64Program", description="Loads and runs the C64 BASIC V2.0 program from the agent's external memory on the connected Commodore 64 hardware")
         def run_c64_program(runtime: ToolRuntime[None, VibeC64AgentState]) -> str:
-            return self._run_c64_program(runtime)
+            source_code = runtime.state.get("current_source_code", "")
+            if self.is_c64u_api_connected():
+                return self.run_c64_program_c64u_api(source_code)
+            elif self.is_kungfuflash_connected():
+                return self.run_c64_program_kungfu(source_code)
+            else:
+                return "Error: No compatible hardware connected to run the C64 program."
         
         @tool("RestartC64", description="Restarts the connected Commodore 64 hardware")
         def restart_c64(runtime: ToolRuntime[None, VibeC64AgentState]) -> str:
@@ -65,7 +95,7 @@ class HWAccessTools:
         if self.is_c64keyboard_connected():
             tools.append(restart_c64)
         
-        if self.is_kungfuflash_connected():
+        if self.is_kungfuflash_connected() or self.is_c64u_api_connected():
             tools.append(run_c64_program)
             
         return tools
@@ -81,10 +111,35 @@ class HWAccessTools:
     #     temp_prg_path = agent_utils.convert_c64_bas_to_prg(temp_bas_path)
     #     return temp_prg_path, temp_bas_file
     
-    
-    def _run_c64_program(self, runtime: ToolRuntime[None, VibeC64AgentState]) -> str:
+    def run_c64_program_c64u_api(self, source_code: str) -> str:
+        
 
-        source_code = runtime.state.get("current_source_code", "")
+        if not self.c64u_api_connected:
+            return "Error: C64U API hardware not connected. Cannot run program on Commodore 64."
+
+        # Write / overwrite the source code to a temporary PRG file
+        temp_bas_path = os.path.join("output", "temp_program.bas")
+        with open(temp_bas_path, "w") as temp_bas_file:
+            temp_bas_file.write(source_code)
+        
+        # Convert the source code to a PRG file
+        _, prg_data = agent_utils.convert_c64_bas_to_prg(bas_file_path=temp_bas_path, write_to_file=True)
+
+        async def run_prg_via_api():
+            async with C64UApiClient(self.c64u_api_base) as api:
+                response = await api.reset_machine_soft()
+                time.sleep(4)  # Wait for reset to complete
+                response = await api.run_prg_binary(prg_data)
+                return response
+
+        response = asyncio.run(run_prg_via_api())
+
+        if "errors" in response:
+            return f"Error running program via C64U API: {response['errors']}"
+
+        return "Program loaded and started on the Commodore 64 Ultimate"
+    
+    def run_c64_program_kungfu(self, source_code: str) -> str:
 
         if not self.kungfuflash_connected:
             return "Error: KungFuFlash hardware not connected. Cannot run program on Commodore 64."
@@ -111,9 +166,3 @@ class HWAccessTools:
     def _restart_c64(self):
         self.c64keyboard.restart_c64()
         return "Commodore 64 restarted."    
-
-
-# @tool("RunC64Program", description="Loads and runs a C64 BASIC V2.0 program on the connected Commodore 64 hardware")
-# def run_c64_program(source_code: str) -> str:
-#     c64hw.run_program_from_text(source_code, restart_c64=True)
-#     return "Program loaded and started on the Commodore 64 hardware."

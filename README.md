@@ -4,15 +4,13 @@
 
 VibeC64 is an AI agent specialized in creating games for the Commodore 64 computer using BASIC V2.0. It leverages modern AI models (LLMs) to design, code, test, and optionally run C64 programs on real hardware or emulators.
 
-**Created by Bence Blaske - 2026**
-
 ## ✨ Features
 
 - **AI-Powered Game Design**: Create complete game designs based on an idea
 - **Automatic Code Generation**: Generates syntactically correct C64 BASIC V2.0 code
 - **Syntax Checking**: Built-in LLM-based and rule-based syntax validation
-- **Hardware Integration**: Optional support for real C64 hardware via:
-  - C64U support coming soon (using its REST APIs)
+- **Hardware Integration**: Optional support for real C64 hardware. Only available when deployed locally.
+  - Experimental C64U support (using its REST APIs)
   - KungFu Flash USB device for program loading (requires modified firmware)
   - Direct C64 keyboard control via a custom built device
   - Video capture for screen analysis
@@ -32,7 +30,7 @@ VibeC64 is an AI agent specialized in creating games for the Commodore 64 comput
 
 ### Optional Hardware
 - KungFu Flash USB device, with modified firmware (for loading programs on real C64)
-- C64U support coming soon (using its REST APIs)
+- Experimental C64U support (using its REST APIs)
 - USB keyboard interface for C64 (custom built, details coming soon)
 - Video capture device (for screen capture analysis, optional)
 
@@ -116,23 +114,21 @@ VibeC64/
 │   ├── agent_utils.py      # Agent helper functions
 │   ├── chainlit_middleware.py  # Chainlit integration middleware
 │   ├── c64_syntax_checker.py   # C64 BASIC syntax validation
-│   ├── bas2prg.py          # BASIC to PRG converter
+│   ├── bas2prg.py          # BASIC to PRG converterF
 │   ├── c64_hw.py           # C64 hardware interface
 │   ├── c64_keymaps.py      # C64 keyboard mappings
 │   ├── kungfuflash_usb.py  # KungFu Flash USB communication
 │   └── formatting.py       # Output formatting utilities
 │
 ├── resources/              # Resource files
-│   └── examples/           # Example C64 BASIC programs
-│       ├── adv.bas
-│       └── gengszter.bas
+│   └── examples/           # Example C64 BASIC programs (for the AI agent to learn from)
 │
 ├── output/                 # Generated programs output directory
 │
 └── public/                 # Web interface assets
     ├── avatars/           # Chat avatars
     └── elements/          # Custom UI elements
-        └── EmulatorLink.jsx  # Emulator launch component
+        └── RunProgramButtons.jsx  # Run program buttons component (emulator, KungFu Flash, C64U)
 ```
 
 ## 🔧 How It Works
@@ -240,7 +236,7 @@ graph TD
 When C64 hardware is available:
 
 - **KungFu Flash**: USB device that allows loading programs directly
-- **Commodore 64 Ultimate**: coming soon! Will support sending programs directly to the Commodore 64 Ultimate via its REST APIs
+- **Commodore 64 Ultimate**: Experimental. Supports sending programs directly to the Commodore 64 Ultimate via its REST APIs
 - **C64 Keyboard**: Serial interface for sending keystrokes
 - **Capture Device**: Video capture for screen analysis via OpenCV
 
@@ -270,6 +266,10 @@ Multi-layered validation ensures code quality:
 The `resources/examples/` folder contains sample C64 BASIC programs:
 - **adv.bas**: Text adventure game
 - **gengszter.bas**: A hungarian text based adventure game
+- **space_invaders.bas**: Space invaders clone
+- **bowl_and_score.bas**: Bowling game with characters
+- **terror_town.bas**: Text based adventure game
+- **commander.bas**: War simulation
 
 These examples are used by the LLM as few-shot examples for better syntax following and game design ideas.
 
@@ -320,7 +320,6 @@ These examples are used by the LLM as few-shot examples for better syntax follow
 
 ### Planned Features
 - 🔄 More BASIC V2 game examples for demonstrating more complex games
-- 🔄 Commodore 64 Ultimate REST API support
 - 🔄 Sprite and graphic asset generation using generative AI
 - 🔄 Sound effect and music generation tools
 - 🔄 User registration and conversation persistency

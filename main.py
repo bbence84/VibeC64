@@ -80,7 +80,7 @@ async def initialize_agent():
     hw_access_tools = cl.user_session.get("hw_access_tools")
 
     # Initialize tool classes
-    coding_tools = CodingTools(llm_access=llm_access_provider, cl=cl)
+    coding_tools = CodingTools(llm_access=llm_access_provider, cl=cl, hw_access_tools=hw_access_tools)
     testing_tools = TestingTools(llm_access=llm_access_provider, capture_device_connected=hw_access_tools.is_capture_device_connected())
     game_design_tools = GameDesignTools(llm_access=llm_access_provider)
 
@@ -91,7 +91,7 @@ async def initialize_agent():
     Use the various tools at your disposal to create, test, and run C64 BASIC V2.0 games.
     When given a user request, first determine if it involves creating or modifying a C64 BASIC V2.0 game.
 
-    Right at the beginning of the game creation or modification process, emit a short statement that the process has been started and mention the initial steps you will take.
+    Right at the beginning of the game creation or modification process, don't start using the tools right away, but emit a short statement that the process has been started and mention the initial steps you will take. Don't use Chinese though fragments.
 
     Tool use instructions:
     - If code creation or modification is needed, first use the DesignGamePlan tool to create a detailed game design plan 
@@ -99,12 +99,12 @@ async def initialize_agent():
        - The CreateUpdateC64BasicCode tool should recieve all the details from the game design plan, how the code should be generated, what features to include etc.
     - After generating the code, use the SyntaxChecker tool to ensure there are no syntax errors.
     - If there are syntax errors, correct them using the FixSyntaxErrors tool and re-check them using the SyntaxChecker tool until the code is error-free.
-    {"- Use the RunC64Program tool to load and run the final C64 BASIC V2.0 program on the connected Commodore 64 hardware." if hw_access_tools.is_kungfuflash_connected() else ""}
+
     {"- If at any point you need to restart the C64 hardware, use the RestartC64 tool." if hw_access_tools.is_c64keyboard_connected() else ""}
     {"- Use the CaptureC64Screen tool to capture the current screen of the C64 and analyze what is displayed, i.e to verify if the program started and looks good." if hw_access_tools.is_capture_device_connected() else ""}
     - No need to persist and edit the source code during the creation process, as the agent has external memory to store the current source code.
     
-    At the end of the process, don't provide links to the PRG or BASE files, just state that the files are ready for download.
+    At the end of the process, don't provide links to the PRG or BASE files, just state that the files are ready for download or execution.
     Throughout the process, make use of the write_todos tool to keep track of your tasks and ensure all steps are completed systematically.
     Communicate with the user in English, even if the game itself is to be created in another language.
     At the end of the tasks, update the todo list with write_todos to mark all tasks as completed.
@@ -147,6 +147,8 @@ async def display_welcome_message():
     """
     hw_access_tools = cl.user_session.get("hw_access_tools")
     hardware_status = []
+    if hw_access_tools.is_c64u_api_connected():
+        hardware_status.append("- ✓ Commodore 64 Ultimate connected - ready to run programs directly on real C64 hardware")
     if hw_access_tools.is_kungfuflash_connected():
         hardware_status.append("- ✓ KungFu Flash connected - ready to run programs directly on real C64 hardware")
     if hw_access_tools.is_c64keyboard_connected():
@@ -219,6 +221,18 @@ async def init_settings():
 
         ]).send()
     return settings
+
+@cl.on_window_message
+async def on_window_message(message: dict):
+    if "command" in message:
+        command = message["command"]
+        hw_access_tools = cl.user_session.get("hw_access_tools")
+        current_source_code = message.get("basic_source_code", "")
+        if command == "start_program_on_c64u":
+            response = hw_access_tools.run_c64_program_c64u_api(current_source_code)
+        elif command == "start_program_on_kungfu":
+            response = hw_access_tools.run_c64_program_kungfu(current_source_code)
+        logger.info(f"Hardware command for program RUN response: {response}")
 
 @cl.on_settings_update
 async def on_settings_update(settings):

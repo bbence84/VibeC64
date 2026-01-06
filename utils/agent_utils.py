@@ -48,11 +48,12 @@ def read_example_programs(num_examples: int = 5) -> str:
     for i, filename in enumerate(example_files):
         if i >= num_examples:
             break
-        with open(os.path.join("resources/examples", filename), "r") as f:
-            examples.append(f.read())
+        with open(os.path.join("resources/examples", filename), "r", encoding="utf-8") as f:
+            content = f.read()
+            examples.append(f"```basic\n{content}\n```")
     return "\n\n".join(examples)
 
-def convert_c64_bas_to_prg(bas_file_path: str = None, bas_code: str = None, write_to_file: bool = True) -> str:
+def convert_c64_bas_to_prg(bas_file_path: str = None, bas_code: str = None, write_to_file: bool = True) -> (tuple[str, bytes]):
     prg_file_path = None
     converter = Bas2Prg()
     if bas_code is not None:

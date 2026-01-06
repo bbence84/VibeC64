@@ -8,7 +8,7 @@
 #      ░░░      ░░░░░ ░░░░░░░░   ░░░░░░    ░░░░░░░░░   ░░░░░░░░        ░░░░░                                                                        
 # -----------------------------------------------------------
 # VibeC64: An AI Agent for Commodore 64 Program Creation
-# Created by Bence Blaske - 2025
+# Created by Bence Blaske - 2026
 # -----------------------------------------------------------                                       
 
 import os
