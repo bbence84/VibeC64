@@ -1,11 +1,11 @@
 version: '3.8'
 
 services:
-  vibec64:
+  vibec64_prod:
     build:
       context: .
       dockerfile: Dockerfile-prod
-    container_name: vibec64
+    container_name: vibec64_prod
     ports:
       - "8030:8030"
     env_file:
