@@ -3,6 +3,7 @@ import time
 import logging
 from langchain.tools import tool, ToolRuntime
 from typing import Annotated, Literal, NotRequired
+from tools import agent_state
 from tools.agent_state import VibeC64AgentState
 from utils.c64_hw import C64HardwareAccess
 import utils.agent_utils as agent_utils
@@ -12,6 +13,7 @@ logger = logging.getLogger(__name__)
 class TestingTools:
     def __init__(self, llm_access):
         self.model_screen_ocr = None
+        self.model_coder = None
         self._init_c64_keyboard()
         self.capture_device_connected  = False
         self.c64keyboard_connected = False
@@ -36,6 +38,14 @@ class TestingTools:
             press_enter: Annotated[bool, "Whether to press Enter after typing the text."] = False,
             ) -> str:
             return self._send_text_to_c64(text_to_type, press_enter)  
+        
+        @tool("AnalyzeGameMechanics", description="Analyzes the game mechanics based the source code of the game.")
+        def analyze_game_mechanics(
+            runtime: ToolRuntime[None, VibeC64AgentState],
+            ) -> str:
+            if self.model_coder is None:
+                self.model_coder = self.llm_access.get_llm_model(create_new=True, streaming=False)
+            return self._analyze_game_mechanics(runtime)
 
         tools = []
         if self.capture_device_connected:
@@ -77,6 +87,21 @@ class TestingTools:
             return f"Text {text_to_type} sent to C64 keyboard."
         else:
             return "Error: C64 keyboard hardware not connected. Cannot send text."
+        
+    def _analyze_game_mechanics(self, runtime: ToolRuntime[None, VibeC64AgentState]) -> str:
+        source_code = runtime.state.get("current_source_code", "")
+
+        analysis_results = self.model_coder.invoke([
+            {"role": "system", "content": "You are an expert Commodore 64 programmer and game designer. You understand the C64 BASIC programming language. You can analyze C64 game source code and explain the game mechanics in detail, for example, how to control the game, what the player can do, and any interesting features or behaviors in the code."},
+            {"role": "user",  "content": 
+            f"""
+            Please analyze the following Commodore 64 game source code and explain the game mechanics in detail. Describe how the game works, what the player can do, and any interesting features or behaviors in the code.
+
+            Here is the source code:
+            {source_code}
+            """},
+        ])
+        return agent_utils.get_message_content(analysis_results.content)
 
     def _capture_c64_screen(self, additional_context: Annotated[str, "What the program should do or what should be checked on the screenshot."] = "") -> str:
         # Capture the screen from the C64 hardware using the webcam
