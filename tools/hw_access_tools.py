@@ -2,9 +2,9 @@ import os
 import time
 import logging
 import asyncio
+from typing import Annotated, Literal, NotRequired
 from typing_extensions import runtime
 
-from utils.c64_hw import C64HardwareAccess
 from utils.kungfuflash_usb import KungFuFlashUSB
 from utils.c64u_api import C64UApiClient
 
@@ -17,15 +17,7 @@ logger = logging.getLogger(__name__)
 class HWAccessTools:
     def __init__(self):
         self._init_kungfu_flash()
-        self._init_c64_keyboard()
         self._init_c64u_api()
-        self.capture_device_connected = False
-
-    def is_capture_device_connected(self):
-        return self.capture_device_connected
-
-    def is_c64keyboard_connected(self):
-        return self.c64keyboard_connected
 
     def is_kungfuflash_connected(self):
         return self.kungfuflash_connected
@@ -49,18 +41,6 @@ class HWAccessTools:
         except Exception as e:
             logger.warning(f"Could not connect to C64U API at {self.c64u_api_base}. Continuing without C64U API access.")
             self.c64u_api_connected = False
-
-    def _init_c64_keyboard(self):
-        try:
-            keyboard_port = os.getenv("C64_KEYBOARD_DEVICE_PORT")
-            if keyboard_port is None or keyboard_port.strip() == "":
-                self.c64keyboard_connected = False
-                return
-            self.c64keyboard = C64HardwareAccess(device_port=keyboard_port, baud_rate=19200, debug=False)
-            self.c64keyboard_connected = True
-        except Exception as e:
-            logger.warning(f"Could not connect to C64 keyboard hardware on port {keyboard_port}. Continuing without keyboard access.")
-            self.c64keyboard_connected = False
 
     def _init_kungfu_flash(self):
         try:
@@ -86,17 +66,10 @@ class HWAccessTools:
             else:
                 return "Error: No compatible hardware connected to run the C64 program."
         
-        @tool("RestartC64", description="Restarts the connected Commodore 64 hardware")
-        def restart_c64(runtime: ToolRuntime[None, VibeC64AgentState]) -> str:
-            return self._restart_c64()
-        
         tools = []
-
-        if self.is_c64keyboard_connected():
-            tools.append(restart_c64)
         
         if self.is_kungfuflash_connected() or self.is_c64u_api_connected():
-            tools.append(run_c64_program)
+            tools.append(run_c64_program)           
             
         return tools
     
@@ -163,6 +136,3 @@ class HWAccessTools:
             else:
                 return "Failed to send program to Commodore 64 hardware."
         
-    def _restart_c64(self):
-        self.c64keyboard.restart_c64()
-        return "Commodore 64 restarted."    

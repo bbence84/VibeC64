@@ -1,25 +1,84 @@
+import os
+import time
+import logging
 from langchain.tools import tool, ToolRuntime
 from typing import Annotated, Literal, NotRequired
+from tools.agent_state import VibeC64AgentState
+from utils.c64_hw import C64HardwareAccess
 import utils.agent_utils as agent_utils
 
+logger = logging.getLogger(__name__)
+
 class TestingTools:
-    def __init__(self, llm_access, capture_device_connected=False):
-        self.model_screen_ocr = llm_access.get_llm_model(create_new=True, streaming=False)
-        self.capture_device_connected = capture_device_connected
+    def __init__(self, llm_access):
+        self.model_screen_ocr = None
+        self._init_c64_keyboard()
+        self.capture_device_connected  = False
+        self.c64keyboard_connected = False
+        self.llm_access = llm_access
 
     def tools(self):
 
-        @tool("CaptureC64Screen", description="Captures the current screen of the C64 and returns what is displayed")
-        def capture_c64_screen(program_specifications: Annotated[str, "What the program should do in theory."] = "") -> str:
-            return self._capture_c64_screen(program_specifications)
+        @tool("CaptureC64Screen", description="Captures the current screen of the C64 and returns what is displayed, related to the provided additional context / question")
+        def capture_c64_screen(additional_context: Annotated[str, "What the program should do or what should be checked on the screenshot."] = "") -> str:
+            if self.model_screen_ocr is None:
+                self.model_screen_ocr = self.llm_access.get_llm_model(create_new=True, streaming=False)
+            return self._capture_c64_screen(additional_context)
+
+        @tool("RestartC64", description="Restarts the connected Commodore 64 hardware")
+        def restart_c64(runtime: ToolRuntime[None, VibeC64AgentState]) -> str:
+            return self._restart_c64()
+        
+        @tool("SendTextToC64", description="Sends the given text or key press on the connected Commodore 64 hardware keyboard")
+        def send_text_to_c64(
+            runtime: ToolRuntime[None, VibeC64AgentState],
+            text_to_type: Annotated[str, "Text to send to the Commodore 64 keyboard."],
+            press_enter: Annotated[bool, "Whether to press Enter after typing the text."] = False,
+            ) -> str:
+            return self._send_text_to_c64(text_to_type, press_enter)  
 
         tools = []
         if self.capture_device_connected:
             tools.append(capture_c64_screen)
 
-        return tools
+        if self.c64keyboard_connected:
+            tools.append(restart_c64)
+            tools.append(send_text_to_c64)            
 
-    def _capture_c64_screen(self, program_specifications: Annotated[str, "What the program should do in theory."] = "") -> str:
+        return tools
+    
+    def is_c64keyboard_connected(self):
+        return self.c64keyboard_connected    
+    
+    def is_capture_device_connected(self):
+        return self.capture_device_connected    
+    
+    def _restart_c64(self):
+        self.c64keyboard.restart_c64()
+        return "Commodore 64 restarted."    
+    
+    def _init_c64_keyboard(self):
+        try:
+            keyboard_port = os.getenv("C64_KEYBOARD_DEVICE_PORT")
+            if keyboard_port is None or keyboard_port.strip() == "":
+                self.c64keyboard_connected = False
+                return
+            self.c64keyboard = C64HardwareAccess(device_port=keyboard_port, baud_rate=19200, debug=False)
+            self.c64keyboard_connected = True
+        except Exception as e:
+            logger.warning(f"Could not connect to C64 keyboard hardware on port {keyboard_port}. Continuing without keyboard access.")
+            self.c64keyboard_connected = False    
+    
+    def _send_text_to_c64(self, text_to_type: str, press_enter: bool = False) -> str:
+        if self.is_c64keyboard_connected():
+            self.c64keyboard.type_text(text_to_type)
+            if press_enter:
+                self.c64keyboard.tap_key("Return")
+            return f"Text {text_to_type} sent to C64 keyboard."
+        else:
+            return "Error: C64 keyboard hardware not connected. Cannot send text."
+
+    def _capture_c64_screen(self, additional_context: Annotated[str, "What the program should do or what should be checked on the screenshot."] = "") -> str:
         # Capture the screen from the C64 hardware using the webcam
         image_path = agent_utils.get_webcam_snapshot()
 
@@ -35,9 +94,9 @@ class TestingTools:
             [ {"type": "text", "text": 
                 f"""
                 Please analyze the image carefully and return what you see. If it's a simple text based program, return it as pure text, properly idented and formatted. If it's a graphical screen i.e. a game, describe what you can see and tell if there's anything unusual i.e. error messages and exception, etc."""
-                if program_specifications == "" else
+                if additional_context == "" else
                 f"""
-                The program was supposed to do the following: {program_specifications}. Please also compare what you see on the screen with what the program was supposed to do.
+                The additional context that should be anwsered, i.e. what the program does or what should be checked: {additional_context}. Please compare what you see on the screen with this context.
                 """
                 }, img_message,]},
         ])

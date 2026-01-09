@@ -57,13 +57,15 @@ set_model_settings_alert = '<span style="color:red">⚠️**Set your AI model an
 
 @cl.on_chat_start
 async def on_chat_start():
-    cl.user_session.set("llm_access_provider", LLMAccessProvider())
-    cl.user_session.set("hw_access_tools", HWAccessTools())
-    
-    await display_welcome_message()
+    llm_access_provider = LLMAccessProvider()
+    cl.user_session.set("llm_access_provider", llm_access_provider)
+    cl.user_session.set("hw_access_tools", HWAccessTools()) 
+    cl.user_session.set("testing_tools", TestingTools(llm_access=llm_access_provider))    
     
     logger.info("Loading AI model from environment variables if available...")
     load_ai_model_from_env()
+
+    await display_welcome_message()
 
     await init_settings()
     
@@ -78,10 +80,10 @@ async def initialize_agent():
 
     llm_access_provider = cl.user_session.get("llm_access_provider")
     hw_access_tools = cl.user_session.get("hw_access_tools")
+    testing_tools = cl.user_session.get("testing_tools")
 
     # Initialize tool classes
     coding_tools = CodingTools(llm_access=llm_access_provider, cl=cl, hw_access_tools=hw_access_tools)
-    testing_tools = TestingTools(llm_access=llm_access_provider, capture_device_connected=hw_access_tools.is_capture_device_connected())
     game_design_tools = GameDesignTools(llm_access=llm_access_provider)
 
     model_agent = llm_access_provider.get_llm_model()
@@ -100,8 +102,8 @@ async def initialize_agent():
     - After generating the code, use the SyntaxChecker tool to ensure there are no syntax errors.
     - If there are syntax errors, correct them using the FixSyntaxErrors tool and re-check them using the SyntaxChecker tool until the code is error-free.
 
-    {"- If at any point you need to restart the C64 hardware, use the RestartC64 tool." if hw_access_tools.is_c64keyboard_connected() else ""}
-    {"- Use the CaptureC64Screen tool to capture the current screen of the C64 and analyze what is displayed, i.e to verify if the program started and looks good." if hw_access_tools.is_capture_device_connected() else ""}
+    {"- If at any point you need to restart the C64 hardware, use the RestartC64 tool." if testing_tools.is_c64keyboard_connected() else ""}
+    {"- Use the CaptureC64Screen tool to capture the current screen of the C64 and analyze what is displayed, i.e to verify if the program started and looks good." if testing_tools.is_capture_device_connected() else ""}
     - No need to persist and edit the source code during the creation process, as the agent has external memory to store the current source code.
     
     At the end of the process, don't provide links to the PRG or BASE files, just state that the files are ready for download or execution.
@@ -146,14 +148,17 @@ async def display_welcome_message():
     Displays the welcome message with hardware status information.
     """
     hw_access_tools = cl.user_session.get("hw_access_tools")
+    testing_tools = cl.user_session.get("testing_tools")
+
     hardware_status = []
     if hw_access_tools.is_c64u_api_connected():
         hardware_status.append("- ✓ Commodore 64 Ultimate connected - ready to run programs directly on real C64 hardware")
     if hw_access_tools.is_kungfuflash_connected():
         hardware_status.append("- ✓ KungFu Flash connected - ready to run programs directly on real C64 hardware")
-    if hw_access_tools.is_c64keyboard_connected():
+
+    if testing_tools.is_c64keyboard_connected():
         hardware_status.append("- ✓ C64 Keyboard connected - can send keypresses to real C64 hardware")
-    if hw_access_tools.is_capture_device_connected():
+    if testing_tools.is_capture_device_connected():
         hardware_status.append("- ✓ Capture device connected - can capture screen from real C64 hardware")
     
     hardware_info = "\n".join(hardware_status) if hardware_status else "- No Commodore 64 hardware connected - you can still create and test programs in an emulator or download the programs and run them manually on real hardware."

@@ -9,7 +9,7 @@ logger = logging.getLogger(__name__)
 
 class LLMAccessProvider:
     def __init__(self):
-        pass
+        self.llm_model = None
     
     def _map_model_name(self, model_name, use_openrouter=False):
         # Map the following to model IDs from the providers

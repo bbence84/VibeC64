@@ -133,24 +133,25 @@ if __name__ == "__main__":
         #load_and_run_program(f"source_code/guess_hun.bas", run_after_load=True)
         #hardware_access.restart_c64()
         #time.sleep(4)  # Wait for C64 to restart
+        time.sleep(5)
         # hardware_access.tap_key("Return")
         # hardware_access.restart_c64()
-        #hardware_access.load_and_run_program(f"../resources/examples/word.bas", run_after_load=True)
-        #hardware_access.quit_from_program()
+        hardware_access.load_and_run_program("test.bas", run_after_load=True)
+        hardware_access.quit_from_program()
 
         # hardware_access.type_text("9200 DATA 255,255,255,255,255,255,255,255,255,99,0,0")
         #hardware_access.load_and_run_program(f"../resources/examples/invaders.bas", run_after_load=True)
         #hardware_access.type_text("LIST 8015-8052")
         #hardware_access.tap_key("Return")
 
-        # #hardware_access.list_program()
-        for _ in range(200):
-            #hardware_access.type_text(f"""= ! % / ' # & ( ) , - . ; :""")
-            hardware_access.tap_key("Return")
-            hardware_access.type_text(f"""! % ;== NN 123 4 5""")
-            #hardware_access.tap_key("=")
-            #hardware_access.tap_key("Return")
-            time.sleep(0.5)
+        # # #hardware_access.list_program()
+        # for _ in range(200):
+        #     #hardware_access.type_text(f"""= ! % / ' # & ( ) , - . ; :""")
+        #     hardware_access.tap_key("Return")
+        #     hardware_access.type_text(f"""! % ;== NN 123 4 5""")
+        #     #hardware_access.tap_key("=")
+        #     #hardware_access.tap_key("Return")
+        #     time.sleep(0.5)
 
         #hardware_access.type_text("N")
         #hardware_access.tap_key("Return")
