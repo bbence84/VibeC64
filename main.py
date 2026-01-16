@@ -45,7 +45,8 @@ from dotenv import load_dotenv
 env_file = os.getenv("ENV_FILE", ".env")
 load_dotenv(env_file)
 
-RECURSION_LIMIT = 100
+RECURSION_LIMIT = 100  # Increase recursion limit for complex tasks if the agent needs to iterate over the task in many steps
+USE_FILE_SYSTEM = False # Set to True to enable file system access for the agent, but this is usually not needed.
 
 set_model_settings_alert = '<span style="color:red">⚠️**Set your AI model and API key in the Settings panel (⚙️ icon in the chat input area below) before proceeding.**⚠️</span>'
 
@@ -118,27 +119,30 @@ async def initialize_agent():
 
     {testing_instructions}        
 
-    At the end of the process, don't provide links to the PRG or BASE files, just state that the files are ready for download or execution.
+    At the end of the process, don't provide links to the PRG or BAS files, just state that the files are ready for download or execution.
     Throughout the process, make use of the write_todos tool to keep track of your tasks and ensure all steps are completed systematically.
     Communicate with the user in English, even if the game itself is to be created in another language.
     At the end of the tasks, update the todo list with write_todos to mark all tasks as completed.
 
 
     """
-
-    program_path = os.path.abspath(f"output")
-    program_path_relative = program_path[3:] if program_path[1] == ':' else program_path
-    path_instructions = f"""Always use the path {program_path_relative} to list, load and save files, but only save if needed. Don't use drive letters or absolute paths that contain drive letters."""
-
+    path_instructions = ""
+    if USE_FILE_SYSTEM:
+        program_path = os.path.abspath(f"output")
+        program_path_relative = program_path[3:] if program_path[1] == ':' else program_path
+        path_instructions = f"""Always use the path {program_path_relative} to list, load and save files, but only save if needed. Don't use drive letters or absolute paths that contain drive letters."""
+        
     # Combine all tools
     c64_agent_tools = coding_tools.tools() + testing_tools.tools() + hw_access_tools.tools() + game_design_tools.tools()
 
     # Setup middleware with Chainlit tracer
     middleware = [
         TodoListMiddleware(),
-        FilesystemMiddleware(backend=FilesystemBackend()),
         ChainlitMiddlewareTracer()
     ]
+
+    if USE_FILE_SYSTEM:
+        middleware.append(FilesystemMiddleware(backend=FilesystemBackend()))
     
     # Create the agent
     agent = create_agent(

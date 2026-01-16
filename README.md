@@ -66,17 +66,20 @@ git clone https://github.com/bbence84/VibeC64.git
 cd VibeC64
 ```
 
-2. Install dependencies:
+2. Create a new Python virtual environment in the folder, i.e. using venv.
+NOTE: Some of the dependencies of this project won't work with Python 3.14, please use 3.12 instead!
+
+3. Install dependencies:
 ```bash
 pip install -r requirements.txt
 ```
 
-3. Configure environment variables:
+4. Configure environment variables:
 ```bash
 cp .env_template .env
 ```
 
-Edit `.env` and add your AI provider credentials:
+5. Edit `.env` and add your AI provider credentials:
 ```
 AI_MODEL_PROVIDER=google_genai
 AI_MODEL_NAME=gemini-3-flash-preview
