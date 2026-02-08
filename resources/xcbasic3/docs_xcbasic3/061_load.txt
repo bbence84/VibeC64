@@ -1,0 +1,28 @@
+====== LOAD ======
+
+[vic20] [c16] [cplus4] [c64] [c128] [m65]
+
+Load a file from tape or disk to memory.
+
+===== Syntax =====
+
+  LOAD <filename>, <device_no> [, <start_address>]
+	
+The ''LOAD'' command loads a binary file from the given device into memory using the KERNAL load routine.
+
+  * <filename> must be a STRING
+  * <device no> must be a number:
+    * device number 1: tape
+    * device numbers 8-15: disk drives
+  * If <start_address> is not specified, the first to bytes (LB/HB) of the file will be used as the start address. Otherwise the first two bytes of the file will be discarded and the rest will be loaded into the memory address specified by <start_address>.
+
+Use the ''ON ERROR GOTO'' statement beforehand if you want to trap errors during the loading process.
+
+<adm warning>
+File I/O commands are not implemented for the Commodore PET.
+</adm>
+
+===== See also =====
+
+  * [[v3:fileio|]]
+  * [[v3:error_handling|]]

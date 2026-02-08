@@ -1,0 +1,117 @@
+====== VOICE ======
+
+[vic20] [c64] [c16] [cplus4] [c128] [x16] [m65]
+
+Selects various properties like waveform, tone, filters, etc. of a voice. The command is also used for turning a voice on or off. The command implements a uniform interface to the VIC, TED, SID and VERA chips, however differences between the sound capabilities of these chips must be considered as explained in more details below.
+
+===== Syntax =====
+
+  VOICE <voice_no> <subcmd> [<subcmd> ...]
+
+Where **<voice_no>** is a number identifying the voice register. This must be a literal number on almost all platform, except the [x16] where a numeric expression is also accepted.
+
+  * **<voice_no>** must be between 1-3 on [c64] and [c128], except for dual-SID systems, where a number between 1-6 is accepted
+  * On [vic20], voices 1-4 can be used
+  * On [c16] and [cplus4], only ''VOICE 1'' or ''VOICE 2'' are available
+  * The number of voices range from 0 to 15 on the [x16]
+  * The [m65] supports voices 1-12
+
+The command is then is followed by at least one of the following:
+
+  * ''ON'' or ''OFF'' [vic20] [c64] [c16] [cplus4] [c128] [x16] [m65]
+  * ''LEFT'' or ''RIGHT'' [x16]
+  * ''TONE <tone_value>'' [vic20] [c64] [c16] [cplus4] [c128] [x16] [m65]
+  * ''ADSR <attack>, <decay>, <sustain>, <release>'' [c64] [c128] [m65]
+  * ''WAVE SAW|TRI|PULSE|NOISE''  [vic20] [c64] [c16] [cplus4] [c128] [x16] [m65]
+  * ''PULSE <freq>'' [c64] [c128] [x16] [m65]
+  * ''FILTER ON|OFF'' [c64] [c128] [m65]
+  * ''VOLUME'' [x16]
+
+===== Examples =====
+
+  ' Clear all registers
+  SOUND CLEAR
+  VOLUME 15
+  ' Set up voice 1 for a high-pitch sawtooth wave but do not turn it on yet
+  VOICE 1 WAVE SAW TONE 2500 ADSR 0, 7, 12, 1
+  ' Turn it on
+  VOICE 1 ON
+  ' Set up voice 2 properties and turn it on immediately
+  VOICE 2 WAVE PULSE PULSE 450 TONE 400 ADSR 9, 7, 10, 4 ON
+  ' Change its tone while the voice is still on
+  VOICE 2 TONE 2300
+
+===== VOICE ON|OFF =====
+
+Turns the voice on or off. Supported on all platforms.
+
+  VOICE <voice_no> ON
+  VOICE <voice_no> OFF
+
+On [x16], ''ON'' turns on the voice in both left and right channels.
+
+===== VOICE LEFT|RIGHT =====
+
+[x16] Turns the voice on or off on the left or right channel only.
+
+  VOICE <voice_no> LEFT
+  VOICE <voice_no> RIGHT
+===== VOICE TONE =====
+
+Sets the tone (frequency) for a voice. Supported on all platforms.
+
+  VOICE <voice_no> TONE <tone_number>
+
+The //<tone_number>// means a different value on each platform.
+
+  * On [c64] [c128] [m65] it represents the exact frequency as interpreted by the SID chip.
+  * On [c16] [cplus4] it is a value that is passed to the TED chip. Please see the frequency tables in the [[https://archive.org/details/Programmers_Reference_Guide_for_the_Commodore_Plus_4_1986_Scott_Foresman_Co|Programmer's Reference Guide for the Commodore Plus/4]] (Appendix F).
+  * On [vic20] each voice has different frequency ranges. Please see the frequency tables in the [[https://archive.org/details/VIC-20ProgrammersReferenceGuide1stEdition6thPrinti|Commodore VIC-20 Programmer's Reference]] (Page 97).
+  * ON [x16], refer to the [[https://github.com/commanderx16/x16-docs/blob/master/VERA%20Programmer's%20Reference.md#programmable-sound-generator-psg|PSG section section of the VERA Programmer's Reference]]
+
+===== VOICE WAVE =====
+
+Sets the wave form for a particular voice.
+
+  VOICE <voice_no> WAVE SAW    ' sawtooth
+  VOICE <voice_no> WAVE TRI    ' triangle
+  VOICE <voice_no> WAVE PULSE  ' pulse
+  VOICE <voice_no> WAVE NOISE  ' noise
+
+  * On [c64] [c128] [x16] [m65], each voice can take any wave form.
+  * On [c16] [cplus4], voice 1 is always ''PULSE'' and voice 2 can take ''PULSE'' or ''NOISE''
+  * On [vic20], voices 1, 2 and 3 are always ''PULSE'' and voice 4 is always ''NOISE''
+===== VOICE PULSE =====
+
+Sets the pulse frequency for a particular voice. Only works if the waveform of that voice is set to ''PULSE''. Supported on [c64] [c128] [m65] only.
+
+  VOICE <voice_no> WAVE PULSE PULSE <freq>
+  
+Frequency must be a value between 0 AND 4096.
+
+===== VOICE ADSR =====
+
+Sets the envelope for a particular voice. Supported on [c64] [c128] [m65] only.
+
+  VOICE <voice_no> ADSR <attack>, <decay>, <sustain>, <release>
+
+All four values are expressions that must evaluate to a number between 0 and 15.
+
+===== VOICE FILTER ON|OFF =====
+
+Applies or removes filter for the particular voice. The filter properties must be set using the [[FILTER]] command. Supported on [c64] [c128] [m65] only.
+
+  VOICE <voice_no> FILTER ON
+  VOICE <voice_no> FILTER OFF
+
+===== VOICE VOLUME =====
+
+Controls the volume of the sound with a logarithmic curve; 0 is silent, 63 is the loudest. Supported on [x16] only.
+
+  VOICE <voice_no> VOLUME 0 ' Voice is silent
+  VOICE <voice_no> VOLUME 63 ' Voice is loudest
+===== See also =====
+
+  * [[FILTER]]
+  * [[SOUND_CLEAR]]
+  * [[VOLUME]]

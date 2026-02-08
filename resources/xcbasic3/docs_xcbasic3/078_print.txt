@@ -1,0 +1,25 @@
+====== PRINT ======
+
+[pet] [vic20] [c64] [c16] [cplus4] [c128] [x16] [m65]
+
+Output strings and numbers on the currently selected screen, at the current cursor position.
+
+===== Syntax =====
+
+  PRINT <expression> [ ,|; <expression>] ... [;]
+  
+Expressions can be of any type, excluding user-defined types. Expressions are separated with commas ('','') or semicolons ('';'').
+
+  * If the separator is a comma, the cursor will be moved to the next tab position. A tab is 10 characters wide.
+  * If the separator is a semicolon, the cursor will not be moved.
+
+A semicolon at the end of the statement will prevent printing a newline after the last printed expression.
+  
+===== Examples =====
+
+  PRINT "hello world"
+  PRINT "the value of myvar is "; myvar; " and that of anothervar is "; anothervar
+  REM -- tabular output
+  a = 10 : b = 20 : c = 30
+  PRINT a, b, c
+

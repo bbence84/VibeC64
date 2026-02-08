@@ -1,0 +1,12 @@
+====== SHARED ======
+
+[pet] [vic20] [c64] [c16] [cplus4] [c128] [x16] [m65]
+
+The ''SHARED'' keyword can be used in multiple statements to denote that the identifier being defined has shared visibility, meaning that it is visible from within all [[v3:code_modules|code modules]].
+
+===== See also =====
+
+  * [[CONST]]
+  * [[DIM]]
+  * [[FUNCTION]]
+  * [[SUB]]

@@ -1,0 +1,30 @@
+====== IF ======
+
+[pet] [vic20] [c64] [c16] [cplus4] [c128] [x16] [m65]
+
+Conditional statements can be run using ''IF ... ELSE ... END IF'' blocks.
+
+===== Single-line syntax =====
+
+  IF <condition> THEN <statements> [ELSE <statements>]
+
+===== Block syntax =====
+
+  IF <condition> THEN
+    <statements>
+  [ELSE
+    <statements>]
+  END IF
+
+The condition can be any expression that evaluates to a number. If the number is a nonzero value, the condition will pass, if it equals to zero, the condition will fail. Relations are expressions that evaluate to 0 if false, 255 if true:
+
+  PRINT 1 > 0 : REM -- outputs 255
+  
+Therefore the condition can be any numeric expression:
+
+  IF x > 0 AND x < 11 THEN PRINT "the number is between 1 and 10"
+
+
+
+
+

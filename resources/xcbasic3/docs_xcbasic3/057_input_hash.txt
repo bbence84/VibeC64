@@ -1,0 +1,41 @@
+====== INPUT# ======
+
+[vic20] [c16] [cplus4] [c64] [c128] [m65]
+
+The ''INPUT#'' command is used for reading strings from a file, into one or more variables. The file must be opened beforehand using the [[OPEN]] command.
+===== Syntax =====
+
+  INPUT #<logical file number>, <variable> [, <variable>] ...
+
+Differences from CBM BASIC:
+
+  * All variables must be of type STRING. 
+  * Only the comma ('','') character is recognized as record separator. If the input is between quotes (''"'') the comma is regarded as part of the string.
+
+<adm warning>
+File I/O commands are not implemented for the Commodore PET.
+</adm>
+===== Example =====
+
+This example demonstrates writing to and reading from a sequential file:
+
+  OPEN 2, 8, 4, "testfile,s,w"
+  PRINT #2, "{34}quoted,string{34}", "one";"more", "record"
+  CLOSE 2
+  
+  PRINT "file written. now reading..."
+  
+  DIM a$ AS STRING * 12
+  DIM b$ AS STRING * 12
+  DIM c$ AS STRING * 12
+  
+  OPEN 2, 8, 4, "testfile,s,r"
+  INPUT #2, a$, b$, c$
+  PRINT a$, b$, c$
+  CLOSE 2
+
+===== See also =====
+
+  * [[v3:print_hash|]]
+  * [[OPEN]]
+  * [[CLOSE]]

@@ -1,0 +1,20 @@
+~~NOTOC~~ 
+
+====== CBYTE ======
+
+The ''CBYTE()'' function converts its argument to an unsigned 8-bit byte value.
+
+===== Function header =====
+
+  DECLARE FUNCTION CBYTE AS BYTE (arg AS INT) SHARED STATIC INLINE
+  DECLARE FUNCTION CBYTE AS BYTE (arg AS WORD) OVERLOAD SHARED STATIC INLINE
+  DECLARE FUNCTION CBYTE AS BYTE (arg AS LONG) OVERLOAD SHARED STATIC INLINE
+  DECLARE FUNCTION CBYTE AS BYTE (arg AS FLOAT) OVERLOAD SHARED STATIC INLINE
+
+If the argument is an ''INT'', ''WORD'' or ''LONG'' then the function will truncate the number to 8 bits, keeping the least significant byte and discarding the rest. If the argument is a ''FLOAT'' then it will be rounded, converted to fixed point, and then truncated to 8 bits.
+
+===== Examples =====
+
+  PRINT CBYTE(-1) : REM integer to byte, outputs 255
+  PRINT CBYTE(65535) : REM word to byte, outputs 255
+  PRINT CBYTE(100.4) : REM float to byte, outputs 100

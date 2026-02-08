@@ -1,0 +1,20 @@
+====== UCASE$ ======
+
+The ''UCASE$()'' function converts all lowercase letters in a string to their uppercase equivalent.
+
+<adm note>
+Uppercase letters, as well as non-alphabetical characters will not be affected.
+</adm>
+
+===== Function header =====
+
+  DECLARE FUNCTION UCASE$ AS STRING (instr$ AS STRING) SHARED STATIC INLINE
+
+===== Examples =====
+
+  PRINT CHR$($0e) : REM switch to lowercase display
+  PRINT UCASE$("THE String in UpperCase") : REM will output: "THE STRING IN UPPERCASE"
+
+===== See also =====
+
+  * [[LCASE]]

@@ -1,0 +1,13 @@
+====== TI ======
+
+[vic20] [c64] [c16] [cplus4] [c128]
+
+The ''TI()'' function returns the total count of jiffies (1/60 second time increments) since power-on. It returns the same value as the system variable ''TI'' in CBM BASIC.
+
+===== Header =====
+
+  DECLARE FUNCTION TI AS LONG () SHARED STATIC INLINE
+  
+===== Examples =====
+
+  PRINT "seconds since power-on: "; TI() / 60

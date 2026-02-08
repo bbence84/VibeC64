@@ -1,0 +1,30 @@
+====== PRINT# ======
+
+[vic20] [c16] [cplus4] [c64] [c128] [m65]
+
+The ''PRINT#'' command outputs one or more values to a previously opened file. Use the [[OPEN]] statement to open the file first.
+
+===== Syntax =====
+
+  PRINT #<logical_file_no>, <expression> [,|; <expression>] ... [;]
+
+  * <logical_file_no> must evaluate to a number between 0 and 15 and must refer to a file that was previously opened using the [[OPEN]] command.
+  * The subsequent expressions will be written to the file as STRING.
+  * If a comma ('','') is used between two expressions, the records will be separated with a comma character.
+  * If a semicolon ('';'') is used between two expressions, the expressions will be concatenated, and thus they will form a single record.
+  * A newline character will close the list of expressions, unless the statement ends with a semicolon ('';'').
+
+<adm warning>
+File I/O commands are not implemented for the Commodore PET.
+</adm>
+
+===== Example =====
+
+See [[v3:input_hash|]] for an example.
+
+===== See also =====
+
+  * [[v3:input_hash|]]
+  * [[OPEN]]
+  * [[CLOSE]]
+

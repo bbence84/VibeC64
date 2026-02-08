@@ -1,0 +1,17 @@
+====== TYPE ======
+
+[pet] [vic20] [c64] [c16] [cplus4] [c128] [x16] [m65]
+
+The ''TYPE'' keyword starts a new [[v3:udt|user-defined type]] (UDT) block.
+
+===== Syntax =====
+
+  TYPE <name>
+    <field> AS <type>
+    [<field> AS <type>]
+    [...]
+    [SUB <method_name> ...]
+    [FUNCTION <method_name> ...]
+    [...]
+  END TYPE
+

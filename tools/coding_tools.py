@@ -17,6 +17,7 @@ from chainlit.utils import utc_now
 
 LOAD_EXAMPLE_PROGRAMS = True
 EXPERIMENTAL_XCBASIC3_MODE = False
+XCBASIC_REFERENCE_FILE = "reference_compact_functions.md"
 
 C64_BASIC_RULES = """
 C64 BASIC V2.0 has the following rules:
@@ -32,9 +33,10 @@ C64 BASIC V2.0 has the following rules:
 """
 
 XCBASIC_RULES = """
-XC=BASIC has the following rules:
+XC=BASIC3 has the following rules:
 - In order to have proper text display, add a PRINT CHR$($0e) at the beginning of the program.
-- Only use commands and functions available in XC=BASIC
+- Only use commands and functions available in XC=BASIC3, provided in the XC=BASIC3 programming reference.
+- DON'T USE the old 2.x XC=BASIC syntax, use the new 3.x syntax.
 - Don't use accented characters, even for non-English programs.
 - Prefer keyboard control over joystick control for user inputs. 
 - Constants can only be a numeric literal
@@ -42,9 +44,20 @@ XC=BASIC has the following rules:
 - Don't use $ at the end of string variables or % at the end of integer variables.
 - In XC=BASIC, don't use line numbers.
 - Don't use inline CALL, i.e. IF CALL check_win() THEN ... , use a variable to store the result of the CALL and use that variable in the IF condition.
-- XC=BASIC has NO ELSEIF statement, only ELSE after IF ... THEN ... ENDIF. Don't use ELSEIF, you can also use SELECT CASE ... END SELECT for multiple conditions.
+- XC=BASIC3 has NO ELSEIF statement, only ELSE after IF ... THEN ... ENDIF. 
+- Don't use ELSEIF, you can also use SELECT CASE ... END SELECT for multiple conditions.
+- AGAIN, THERE'S NO ELSEIF IN XC=BASIC3. Don't use ELSEIF, NO ELSEIF should be used anywhere.
+- String functions like MID$, LEFT$, RIGHT$ etc. should have the $ at the end, e.g. MID$
 - Use proper indentation for better readability.
 - Don't use empty PRINT statements, i.e. PRINT without any arguments.
+- No special characters outside of those supported by C64 BASIC V2.0, only use PETSCII characters. No UTF-8 or UNICODE characters.
+- A subroutine can not be called before it was defined. Use forward declaration DECLARE SUB somesub if needed.
+- Subroutines are SUB ... ENDSUB, functions are FUNCTION ... ENDFUNCTION., NO PROC ... ENDPROC in XC=BASIC3
+- You must place the OPTION directive before any other statements.
+- Use subrutines instead of GOSUB or GOTO if possible
+- Only strings are allowed in INPUT statement, no numeric inputs directly, read input as string and convert if needed.
+- Since XC=BASIC 3 compiles to efficient assembly, standard BASIC-style delay loops finish almost instantly
+- A more robust timing mechanism is needed using the C64's hardware raster counter (RASTER) or the system Jiffy clock to ensure the speed is consistent and playable regardless of the assembly optimization
 """
 
 class CodingTools:
@@ -230,31 +243,37 @@ class CodingTools:
                 Don't use Markdown formatting, code blocks, or any additional explanations, just the pure source code text.
                 """
         else:   
-            # Read resources/xcbasic3/docs_xcbasic3/reference.md
+
             programming_reference = ""
-            with open("resources/xcbasic3/docs_xcbasic3/reference.md", "r") as f:
-                programming_reference = f.read()
+            with open(f"resources/xcbasic3/docs_xcbasic3/{XCBASIC_REFERENCE_FILE}", "r", encoding="utf-8") as f:
+                programming_reference_text = f.read()
+
             programming_reference = f""" Here is the XC=BASIC programming reference for your help: \n
-            {programming_reference}"""        
+            {programming_reference_text}"""        
+
             code_create_instructions = f"""
                 {code_create_instructions_1}
                 Ensure the code adheres to XC=BASIC syntax and conventions.
                 Provide only the source code as output, nothing else.
-                {XCBASIC_RULES}
+
+                Here comes the language reference. In the created code, only use the available functions and commands as described here and as in the later provided examples:
                 {programming_reference}
                 
                 {'Example XC=BASIC programs for reference, to follow XC=BASIC syntax:' if load_examples else ""}
                 {agent_utils.read_example_programs(num_examples=10, folder="resources/xcbasic3") if load_examples else ""}
                 
                 {code_create_instructions_2}
+
+                {XCBASIC_RULES}
+
                 Don't use Markdown formatting, code blocks, or any additional explanations, just the pure source code text.
                 """
         
         llm_coder_response = self.model_coder.invoke(
             [   {"role": "system", "content": 
-                 f"""You are an expert C64 {used_language} programmer. 
+                 f"""You are an expert {used_language} programmer. 
                  You write syntactically correct code that runs on real Commodore 64 hardware. 
-                 You consider all C64 {used_language} syntax rules and limitations. 
+                 You consider all {used_language} syntax rules and limitations. 
                  You create the code based on the user's description or change instructions."""}, 
                 {"role": "user", "content": code_create_instructions}]
             )
@@ -277,10 +296,10 @@ class CodingTools:
         if self.xcbasic3_mode:
             used_language = "XC=BASIC"
             language_rules = XCBASIC_RULES
-            with open("resources/xcbasic3/docs_xcbasic3/reference.md", "r") as f:
-                programming_reference = f.read()
+            with open(f"resources/xcbasic3/docs_xcbasic3/{XCBASIC_REFERENCE_FILE}", "r", encoding="utf-8") as f:
+                programming_reference_text = f.read()
             additional_hints = f""" Here is the XC=BASIC programming reference for your help: \n
-            {programming_reference}"""   
+            {programming_reference_text}"""   
             line_numbering_hint = "Line numbers have been added for syntax checking purposes, but remember that XC=BASIC does not use line numbers. Remove them from the syntax corrected code."    
             # Check if source_code contains line numbers, if not add them temporarily for syntax checking. Line numbers should be exactly as the actual line number, no 10 increments, etc.
             if not any(line.lstrip().split(' ')[0].isdigit() for line in source_code.splitlines()):

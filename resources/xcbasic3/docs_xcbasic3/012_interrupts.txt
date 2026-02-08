@@ -1,0 +1,147 @@
+====== Interrupts ======
+
+[pet] [vic20] [c64] [c16] [cplus4] [c128] [x16] [m65]
+
+XC=BASIC allows you to set up interrupting rules and write routines that handle interrupts. The supported interrupt types are:
+
+  * **Timer interrupts**, issued after every <N> processor cycles where <N> is a value between 1 and 65535 (supported on all targets)
+  * **Raster interrupts**, issued when the screen raster line reached a certain position (supported on [c64] [c16] [cplus4] [c128] [x16] [m65])
+  * **Vertical blank interrupts**, issued when the screen is fully rendered (supported on [x16]) 
+  * **Sprite collision** interrupts, issued when two or more sprites collide ([c64] [c128] [x16] [m65])
+  * **Sprite-background collision** interrupts, issued when one ore more sprites collide with the background ([c64] [c128] [m65])
+
+<adm note>
+Multiple types of interrupts can be enabled at the same time, allowing your program a great flexibility of responding to events. If an interrupt is "missed" (because another one is currently served), it will be fired immediately after the current service routine is finished.
+</adm>
+
+<adm warning>
+Enabling multiple types of interrupts is not yet supported on the MEGA65.
+</adm>
+
+===== Defining interrupt service routines =====
+
+In order to respond to an interrupt request, you must first define what routine to pass control to when an interrupt is fired. If you don't do this, your program will not know what to do when an interrupt request is issued, so it will go to a random memory address and break. A service routine is nothing but a labelled code point in your program, the same that can be referenced by [[GOTO]] or [[GOSUB]]. For example:
+
+  irqserv:
+    ' Do whatever needs to be done when an interrupt request is issued
+    RETURN
+
+Once you have a service routine, you can reference it within an ''ON <event> GOSUB'' statement:
+
+  ON TIMER <cycles> GOSUB irqserv
+  ON RASTER <line> GOSUB irqserv
+  ON SPRITE GOSUB irqserv
+  ON BACKGROUND GOSUB irqserv
+  ON VBLANK GOSUB irqserv
+
+===== Enabling and disabling interrupts =====
+
+Once the service routines are defined and they're referenced in one or more ''ON <event> GOSUB'' statements, it is safe to enable interrupts:
+
+  TIMER INTERRUPT ON
+  RASTER INTERRUPT ON
+  SPRITE INTERRUPT ON
+  BACKGROUND INTERRUPT ON
+  VBLANK INTERRUPT ON
+
+If you no longer wish to fire interrupts, use the same commands with the ''OFF'' keywords:
+
+  TIMER INTERRUPT OFF
+  RASTER INTERRUPT OFF
+  SPRITE INTERRUPT OFF
+  BACKGROUND INTERRUPT OFF
+  VBLANK INTERRUPT OFF
+
+<adm warning>
+Make sure you you don't enable interrupts before the service routine is referenced in the corresponding ''ON <event> GOSUB'' statement, otherwise your program may break at the first interrupt.
+</adm>
+
+===== Enabling or disabling system background tasks =====
+
+By default, KERNAL runs some "background tasks" that are nothing but a timer interrupt service routine that typically does the following:
+
+  * Flash the cursor
+  * Query the keyboard (required by [[INPUT]] and [[GET]])
+  * Query the joysticks and mouse ([x16])
+  * Update the jiffy count (required by the [[TI]] function)
+
+If your program doesn't require the above, you can turn of the system interrupt service using the following command:
+
+  SYSTEM INTERRUPT OFF
+
+As you guessed, to turn it back on, you can use
+
+  SYSTEM INTERRUPT ON
+===== Restrictions =====
+
+Due to the nature of the runtime environment, there are some things that you must avoid in interrupt service routines:
+
+  - You must not call subs or functions
+  - You must not use floating point arithmetic
+  - You must not use the [[THIS]] keyword
+  - You must not enable or disable other interrupts (although changing their service routine using ''ON <event> GOSUB'' is allowed).
+
+Note that the above rules only apply to the service routine, not the rest of the program.
+
+===== You're driving: safe or fast? =====
+
+Another factor to take into consideration is speed. XC=BASIC reserves a few zero page locations to use as virtual registers. In order to return to the main program flow in a clean state after a service routine is done, the runtime environment must push these virtual registers on the stack before the service routine is entered and pull them back when it finished. This roughly takes 2 times 170 CPU cycles.
+
+You have two options:
+
+  - You accept this penalty, or
+  - If you're sure that your interrupt service routine doesn't mess up the virtual registers, you can declare ''OPTION FASTINTERRUPT'' at the top of your program, which will effectively bypass saving the virtual registers when the routine is entered.
+
+<adm note>
+Virtual registers reside on the zero page between addresses $02 and $0D, inclusive. You can use a machine language monitor to find out if these values were altered after an interrupt service routine was quit. If they weren't, you're good to go with ''OPTION FASTINTERRUPT''.
+</adm>  
+
+===== Examples =====
+
+==== Timer interrupt example ====
+
+The following example will display a counter on the top left corner of the screen while the rest of the program is running.
+
+  DIM i AS DECIMAL
+  i = 0000d
+  DIM a$ AS STRING * 8
+  
+  ON TIMER 10000 GOSUB irqserv
+  TIMER INTERRUPT ON
+  
+  INPUT "what is your name? "; a$
+  END
+  
+  ' This routine will be executed once in every 10,000 cpu cycles
+  irqserv:
+    TEXTAT 0, 0, i
+    i = i + 0001d
+    RETURN
+
+==== Raster interrupt example ====
+
+  ' Turn off swapping of virtual registers
+  ' as we don't use them in this example
+  OPTION FASTINTERRUPT
+   
+  BACKGROUND 0
+   
+  ' This will set up the first interrupt
+  GOSUB irqserv2
+   
+  SYSTEM INTERRUPT OFF
+  ' Go!
+  RASTER INTERRUPT ON
+   
+  ' Loop forever
+  DO : LOOP WHILE 1
+   
+  irqserv1:
+    BORDER 2
+    ON RASTER 120 GOSUB irqserv2
+    RETURN
+   
+  irqserv2:
+    BORDER 1
+    ON RASTER 100 GOSUB irqserv1
+    RETURN

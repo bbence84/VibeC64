@@ -1,0 +1,24 @@
+====== POS ======
+
+[c64] [vic20] [c16] [cplus4] [c128] [x16] [m65]
+
+The ''POS()'' function returns the current column position of the cursor.
+
+===== Function header =====
+
+  DECLARE FUNCTION POS AS BYTE () SHARED STATIC INLINE
+
+===== Example =====
+
+  PRINT "after printing this text{13}the cursor will be in column: ";
+  PRINT POS()
+
+<adm warning>
+This function does not work on the Commodore PET.
+</adm>
+===== See also =====
+
+  * [[CSRLIN]]
+  * [[LOCATE]]
+
+

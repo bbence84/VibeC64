@@ -1,0 +1,41 @@
+====== VMODE ======
+
+[c64] [c16] [cplus4] [c128] [x16] [m65]
+
+Selects the video display mode.
+
+===== Syntax =====
+
+[c64] [c16] [cplus4] [c128] [m65]
+
+  VMODE [TEXT|BITMAP|EXT] [HIRES|MULTI] [ROWS <rows>] [COLS <cols>]
+
+  * TEXT selects text mode
+  * BITMAP selects bitmap mode
+  * EXT selects extended background color mode
+  * HIRES or MULTI switches between high-resolution or multi color mode
+  * ROWS must be provided the literal number 24 or 25 and sets the number of character rows visible on screen accordingly
+  * COLS must be provided the literal number 38 or 40 and sets the number of character rows visible on screen accordingly
+
+===== Examples =====
+
+  ' Selects default text mode
+  VMODE HIRES TEXT
+  ' Selects multi color bitmap mode
+  VMODE MULTI BITMAP
+  ' Selects extended background color mode with the
+  ' left and right character columns covered
+  VMODE EXT COLS 38
+
+[x16]
+
+  VMODE <screen_mode>
+
+Where ''<screen_mode>'' is a valid screen mode accepted by the X16 BASIC command ''SCREEN''. Refer to [[https://github.com/X16Community/x16-docs/blob/master/X16%20Reference%20-%2002%20-%20Editor.md#chapter-2-editor|List of SCREEN modes]].
+
+===== See also =====
+
+  * [[BACKGROUND]]
+  * [[BORDER]]
+  * [[HSCROLL]]
+  * [[VSCROLL]]

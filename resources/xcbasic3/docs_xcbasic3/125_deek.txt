@@ -1,0 +1,14 @@
+====== DEEK ======
+
+The ''DEEK()'' function returns the content of the specified memory address plus one, as a 16-bit WORD. The return value is a number between 0 and 65535.
+
+===== Function declaration =====
+
+  DECLARE FUNCTION DEEK AS WORD (address AS WORD) SHARED STATIC INLINE
+  ' MEGA65 only
+  DECLARE FUNCTION DEEK AS WORD (address AS LONG) OVERLOAD SHARED STATIC INLINE  
+===== Examples =====
+
+  POKE $C000, $AB ' write value lo byte
+  POKE $C001, $CD ' write value hi byte
+  PRINT DEEK($C000) ' outputs 52651 (decimal for $CDAB)

@@ -1,0 +1,21 @@
+====== THIS ======
+
+[pet] [vic20] [c64] [c16] [cplus4] [c128] [x16] [m65]
+
+''THIS'' is a special variable that refers to the instance on which the method was called.
+
+===== Example =====
+
+  TYPE vector
+    x AS INT
+    y AS INT
+    SUB TRANSLATE(dx AS INT, dy AS INT)
+      THIS.x = THIS.x + dx
+      THIS.y = THIS.y + dy
+    END SUB
+  END TYPE
+  
+  DIM v AS vector
+  v.x = 10 : v.y = 10
+  CALL v.TRANSLATE(5, 5)
+  PRINT v.x, v.y

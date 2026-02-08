@@ -1,0 +1,20 @@
+====== LCASE$ ======
+
+The ''LCASE$()'' function converts all uppercase letters in its argument to their lowercase equivalent.
+
+<adm note>
+Lowercase letters, as well as non-alphabetical characters will not be affected.
+</adm>
+
+===== Function header =====
+
+  DECLARE FUNCTION LCASE$ AS STRING (instr$ AS STRING) SHARED STATIC INLINE
+
+===== Examples =====
+
+  PRINT CHR$($0e) : REM switch to lowercase display
+  PRINT LCASE$("THE String in LowerCase") : REM will output: "the string in lowercase"
+
+===== See also =====
+
+  * [[UCASE]]

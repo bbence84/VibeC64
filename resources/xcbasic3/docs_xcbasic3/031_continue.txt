@@ -1,0 +1,20 @@
+====== CONTINUE ======
+
+[pet] [vic20] [c64] [c16] [cplus4] [c128] [x16] [m65]
+
+The ''CONTINUE'' keyword is used for skipping the rest of a ''FOR ... NEXT'' or ''DO ... LOOP'' block and go to the next iteration.
+
+===== Syntax =====
+
+  CONTINUE [FOR|DO]
+  
+When used without the ''FOR'' or ''DO'' keyword, ''CONTINUE'' will be applied to the closest open block.
+
+===== Examples =====
+
+  REM -- Print numbers from 1 to 10 except 5
+  FOR i AS BYTE = 1 TO 10
+    IF i = 5 THEN CONTINUE FOR
+    PRINT i
+  NEXT i
+  

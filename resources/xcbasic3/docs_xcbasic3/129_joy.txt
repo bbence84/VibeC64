@@ -1,0 +1,76 @@
+====== JOY ======
+
+[vic20] [c64] [c16] [cplus4] [c128] [x16] [m65]
+
+The ''JOY()'' function returns the status of either joysticks.
+
+===== Function header =====
+
+  DECLARE FUNCTION JOY AS BYTE (portnum AS BYTE) SHARED STATIC INLINE
+
+Where //portnum// is an expression that evaluates to 1 or 2.
+
+<adm note>
+On the Commodore VIC-20, //portnum// is ignored.
+</adm>
+
+The return value is a BYTE where bits corresponding to a direction are set or unset. The direction to bit mapping if different on each target:
+
+  * On [c64] [c128] [m65]:
+    * Bit #0 is set if joystick is being pulled up
+    * Bit #1 is set if joystick is being pulled down
+    * Bit #2 is set if joystick is being pulled left
+    * Bit #3 is set if joystick is being pulled right
+    * Bit #4 is set if fire button is depressed
+  * On [vic20]:
+    * Bit #2 is set if joystick is being pulled up
+    * Bit #3 is set if joystick is being pulled down
+    * Bit #4 is set if joystick is being pulled left
+    * Bit #5 is set if fire button is depressed
+    * Bit #7 is set if joystick is being pulled right
+  * On [c16] and [cplus4]: 
+    * Bit #0 is set if joystick is being pulled up
+    * Bit #1 is set if joystick is being pulled down
+    * Bit #2 is set if joystick is being pulled left
+    * Bit #3 is set if joystick is being pulled right
+    * Bit #6 is set if fire button is depressed on joystick 1
+    * Bit #7 is set if fire button is depressed on joystick 2
+
+===== Example =====
+
+Using the following example, you can read the joystick status on all platforms:
+
+  ' Uncomment if target is VIC-20
+  'CONST JOYUP = 4
+  'CONST JOYDN = 8
+  'CONST JOYLT = 16
+  'CONST JOYRT = 128
+  'CONST J1FIRE = 32
+  
+  ' Uncomment if target is C64
+  'CONST JOYUP  = 1
+  'CONST JOYDN  = 2
+  'CONST JOYLT  = 4
+  'CONST JOYRT  = 8
+  'CONST J1FIRE = 16
+  'CONST J2FIRE = 16
+  
+  ' Uncomment if target is C16 or C Plus/4
+  'CONST JOYUP  = 1
+  'CONST JOYDN  = 2
+  'CONST JOYLT  = 4
+  'CONST JOYRT  = 8
+  'CONST J1FIRE = 64
+  'CONST J2FIRE = 128
+  
+  DIM j AS BYTE
+  lab:
+    j = JOY(1)
+    IF j = 0 THEN GOTO lab
+    IF j AND JOYUP THEN PRINT " up";
+    IF j AND JOYDN THEN PRINT " down";
+    IF j AND JOYLT THEN PRINT " left";
+    IF j AND JOYRT THEN PRINT " right";
+    IF j AND J1FIRE THEN PRINT " fire";
+    PRINT ""
+    GOTO lab

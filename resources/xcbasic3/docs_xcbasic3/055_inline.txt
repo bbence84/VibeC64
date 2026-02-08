@@ -1,0 +1,3 @@
+====== INLINE ======
+
+''INLINE'' is a reserved word that is not intended to be used in userland code.

@@ -1,0 +1,32 @@
+====== SYS ======
+
+[pet] [vic20] [c64] [c16] [cplus4] [c128] [x16] [m65]
+
+The ''SYS'' commands calls a machine language subroutine at the specified address.
+
+===== Syntax =====
+
+  SYS <address> [FAST]
+
+If used without the ''FAST'' directive, ''SYS'' will do the same as in CBM BASIC, that is, it will load the accumulator, the X and the Y register, and the status register from addresses $030C-$030F (on C64 and VIC-20) or $07F2-$07F5 (on CPlus/4 and C16) before the call. When the subroutine exits, ''SYS'' will save the values of these registers to the same memory addresses.
+
+If however it is used with the ''FAST'' directive, a simpler and faster procedure is taken: the program will just jump to the specified address, without loading and saving the registers before and after the call.
+
+<adm note>
+Use the ''FAST'' directive if you don't need to pass values in registers to the subroutine.
+</adm>
+
+===== Examples =====
+
+  SYS $C000 FAST : REM calls a subroutine at $C000 without passing registers
+  SYS 64738 FAST : REM restarts the machine
+  
+  REM -- Printing a character on screen using the KERNAL function CHROUT
+  CONST CHROUT =  $FFD2
+  CONST ACCU = $030C ' C64 and VIC-20 only
+  POKE ACCU, 'A': REM to load accumulator with the PETSCII code of 'A'
+  SYS CHROUT : REM will output "A"
+  
+
+
+

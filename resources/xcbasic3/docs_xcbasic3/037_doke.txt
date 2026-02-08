@@ -1,0 +1,18 @@
+====== DOKE ======
+
+[pet] [vic20] [c64] [c16] [cplus4] [c128] [x16] [m65]
+
+===== Syntax =====
+
+  DOKE <address>, <value>
+
+The ''DOKE'' command stores a 16-bit value (WORD or INT) in two consecutive bytes at the given memory address.
+
+===== Examples =====
+
+  DOKE $C000, 1986 ' Will store the value to $C000-$C001
+  PRINT DEEK($C000)
+ 
+===== See also =====
+
+  * [[v3:deek]]

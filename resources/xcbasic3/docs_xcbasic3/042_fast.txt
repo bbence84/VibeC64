@@ -1,0 +1,6 @@
+====== FAST ======
+
+The ''FAST'' keyword can be used:
+
+  * In a [[DIM]] statement to instruct the compiler to assign a zeropage address to the variable
+  * In a [[SYS]] statement in order to skip fetching registers before and after the system call

@@ -1,0 +1,95 @@
+====== File I/O ======
+
+[vic20] [c16] [cplus4] [c64] [c128] [m65]
+
+File input-output in XC=BASIC was designed to be mostly compatible with CBM BASIC so that the same commands can be used for opening, reading from and writing to files. Since XC=BASIC is a strongly typed language, and therefore it comes with restrictions, there are some small differences to be aware of. Those differences are explained on each command's reference page.
+
+In addition, new commands have been added for binary writing and reading that allow convenient storing and recalling of simple or complex data structures, without the headache of encoding and decoding textual data.
+
+<adm warning>
+File I/O commands are not implemented for the Commodore PET.
+</adm>
+
+The following guide focuses on the differences between CBM BASIC and XC=BASIC rather than explaining how to use the commands that are compatible. The Commodore-64 and 1541 User Guides explain almost everything you need to know about the "traditional" file I/O commands.
+
+===== LOAD and SAVE =====
+
+CBM BASIC's ''LOAD'' and ''SAVE'' commands can store and recall either BASIC programs or binary data to and from a peripheral device (e. g tape or disk drive). XC=BASIC is compiled to machine language and therefore it doesn't make much sense to support loading and saving BASIC programs. For this reason, [[LOAD]] and [[SAVE]] in XC=BASIC are used for loading and saving binary data only. To save a particular memory area to disk or tape, you must use the following command:
+
+  SAVE <filename>, <device_no>, <start_address>, <end_address>
+  
+Let's say you want to store the memory contents at $8000-$83FF (that is, 1K of data) on disk, you can use the following command:
+
+  SAVE "mydata", 8, $8000, $83FF
+
+This will call the KERNAL function SAVE that will open the file and save the memory contents. The first two byte in the file will contain a pointer to the address $8000 so that ''LOAD'' will know where to recall data in memory if needed. These first two bytes are called the "load address".
+
+<adm note>
+You may use both decimal or hexadecimal numbers in XC=BASIC for specifying addresses and other numbers as well.
+</adm>
+
+When you wish to recall data from disk (or tape), you have two options: either you accept the load address in the file, or you specify a different address. To use the load address that is saved with the file, use the command:
+
+  LOAD <filename>, <device_no>
+
+Whereas to specify a different address:
+
+  LOAD <filename>, <device_no>, <destination_address>
+  
+The latter form allows you to recall data to a different address in memory. For example:
+
+  LOAD "mydata", 8, $C000
+
+The above command will read data that was saved above to a different address, in this case $C000-$C3FF.
+
+<adm warning>
+If the destination address is specified in a ''LOAD'' statement, the first two bytes of the file will always be discarded, regardless of whether they were intended to serve as a load address or they're part of the actual data.
+</adm>
+
+===== READ and WRITE =====
+
+The ''PRINT#'' and ''INPUT#'' commands in CBM BASIC work with PETSCII-encoded data. XC=BASIC also supports [[PRINT_hash]] and [[INPUT_hash]], and they behave almost exactly the same, which means that data saved in CBM BASIC should be readable in XC=BASIC and vice versa.
+
+Apart from that, XC=BASIC supports reading and writing binary data. This means that any variable is written to a file will be written using the exact same binary representation as the variable's value is stored in memory. Binary output and input therefore allows you to save and restore data just as they are, without conversion.
+
+The other advantage of binary I/O is that you can save and restore complex data structures (see [[udt]]) easily, in one go. Check out the following example:
+
+  TYPE GAMESTATE
+    playername$ AS STRING * 8
+    score AS DECIMAL
+    level AS BYTE
+    monsterscount AS INT
+  END TYPE
+  
+  DIM state AS GAMESTATE
+  
+  REM -- save the game!
+  OPEN 2,8,2,"savegame,s,w"
+  WRITE #2, state
+  CLOSE 2
+  
+  REM -- load a saved game!
+  OPEN 2,8,2,"savegame,s,r"
+  READ #2, state
+  CLOSE 2
+
+This convenience comes with a cost: you must take extra care with the data types when using ''READ#'' and ''WRITE#''. Since only the data is saved to the file, not the data type, ''READ#'' can only rely on what type of variable you specified as its argument(s). If the data is not the same type as the variable, you'll face unwanted behavior, as in the following example:
+
+  OPEN 2, 8, 2, "myfile,s,w" : REM open file for writing
+  WRITE #2, 5, 6, 7 : REM write the numbers 5, 6 and 7 (3 bytes all together)
+  CLOSE 2
+  
+  DIM a AS INT : REM note a, b and c are integers
+  DIM b AS INT
+  DIM c AS INT
+  
+  OPEN 2, 8, 2, "myfile,s,r" : REM open file for reading
+  READ #2, a, b, c : REM this will try to read 6 bytes
+  PRINT a, b, c
+  CLOSE 2
+
+In the example above we specify the literal numbers 5, 6 and 7 as output data. The compiler will conclude the data type by looking at the numbers and it will treat them as BYTE type [[datatypes#numeric_literals|as per these rules]]. The ''READ #2, a, b, c'' statement however will try to fetch 2 bytes per each variable, resulting in wrong values.
+
+<adm warning>
+Use the type conversion functions [[CBYTE]], [[CINT]], [[CWORD]], [[CLONG]] and [[CFLOAT]] to make sure that the correct data type is output.
+</adm>

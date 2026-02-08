@@ -1,0 +1,9 @@
+====== STRING ======
+
+The ''STRING'' keyword can be used in several statements to designate a variable or value as a string.
+
+===== See also =====
+
+  * [[v3:datatypes|]]
+  * [[v3:dim|]]
+  * [[v3:strings|]]

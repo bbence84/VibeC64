@@ -1,0 +1,42 @@
+======CHARAT======
+
+[pet] [vic20] [c64] [c16] [cplus4] [c128] [x16] [m65]
+
+The ''CHARAT'' command outputs a single character at the given X and Y position of the currently selected screen without affecting the cursor position.
+
+=====Syntax=====
+
+  CHARAT <x_pos>, <y_pos>, <screencode> [, <color>]
+
+  * ''<x_pos>'' must be between 0 and the screen width minus one
+  * ''<y_pos>'' must be between 0 and the screen height minus one
+  * ''<screencode>'' must be between 0 and 255
+  * ''<color>'' is optional. If provided, it must be between 0 and 15 (between 0 and 255 on the [c16], [cplus4], [x16] and [m65]). If not provided, the character color will be whatever value happens to be in its Color RAM location.
+
+<adm note>
+Color values between 8 and 15 will set the character to multi-color mode on the [vic20].
+</adm>
+
+<adm note>
+The lower nybble of the color value will set text color, while the upper nybble will set background color on the [x16].
+</adm>
+
+<adm note>
+Setting the ''<color>'' parameter has no effect on the [pet].
+</adm>
+
+<adm warning>
+The runtime library will not check if the X and Y values are within the screen boundaries. Providing wrong values will lead to writing to memory locations outside the screen memory, thus potentially damaging the program or data. Use it with care.
+</adm>
+=====Examples=====
+
+  REM put an 'A' character near the center of the screen
+  CHARAT 20, 10, 1
+  REM put a 'B' character in the top left corner of the screen, in yellow
+  CHARAT 0, 0, 2, 7
+
+
+=====See Also=====
+
+  * [[v3:SCREEN]]
+  * [[v3:TEXTAT]]

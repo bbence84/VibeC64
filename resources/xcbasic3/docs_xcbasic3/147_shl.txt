@@ -1,0 +1,28 @@
+====== SHL ======
+
+The ''SHL()'' function returns a number bit-shifted //<n>// positions to the left.
+
+===== Function header =====
+
+  DECLARE FUNCTION SHL AS BYTE (num AS BYTE, n AS BYTE) SHARED STATIC INLINE
+  DECLARE FUNCTION SHL AS INT (num AS INT, n AS BYTE) OVERLOAD SHARED STATIC INLINE
+  DECLARE FUNCTION SHL AS WORD (num AS WORD, n AS BYTE) OVERLOAD SHARED STATIC INLINE
+  DECLARE FUNCTION SHL AS LONG (num AS LONG, n AS BYTE) OVERLOAD SHARED STATIC INLINE
+
+Each bit in the number will be moved //<n>// positions to the left. The least significant bit will be filled with zero, whereas the most significant bit will be discarded.
+
+<adm note>
+Since ''SHL(number, n)'' equals ''number * pow(2, n)'', the function is especially useful if you want to multiply a number by powers of two. Bit shifting is carried out much faster than the multiplication operation.
+</adm>
+
+===== Example =====
+
+  PRINT SHL(41, 1) : REM outputs 82
+  PRINT SHL(%00001111, 4) : REM outputs 240 (binary 11110000)
+  PRINT SHL(%10000000, 1) : REM outputs 0 because the MSB is discarded
+  PRINT SHL(CWORD(%10000000), 0) : REM outputs 256 because this time
+                                      REM the argument is 16 bits wide
+
+===== See also =====
+
+  * [[SHR]]

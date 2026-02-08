@@ -1,0 +1,11 @@
+====== INCLUDE ======
+
+===== Syntax =====
+
+  INCLUDE "path/to/filename.bas"
+  
+The ''INCLUDE'' directive instructs the compiler to fetch the contents of another source file and include it in the current source. Nested includes are supported. The path must be a relative path to the current source file.
+
+===== See also =====
+
+  * [[v3:code_modules]]

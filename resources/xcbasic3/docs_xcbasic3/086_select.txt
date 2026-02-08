@@ -1,0 +1,53 @@
+====== SELECT CASE ======
+
+[pet] [vic20] [c64] [c16] [cplus4] [c128] [x16] [m65]
+
+Executes one of several statement blocks depending on the value of an expression.
+
+===== Syntax =====
+
+  SELECT CASE <expr>
+    CASE <exp1> [, <exp2>, <exp3> ... ]
+      <statements>
+    CASE IS <relational operator> <exp4>  
+      <statements>
+    CASE <exp5> TO <exp6>
+      <statements>
+    CASE ELSE
+      <statements>
+  END SELECT
+
+In the first ''CASE'' block above, the value of <expr> is tested against <exp1>, <exp2> and <exp3> and the statement block is executed once one of them equals.
+
+In the second block, a relational operator, <, <=, >, >=, <>, or = is provided and the statement block is executed if the relation evaluates to true. This works with numeric types only. 
+
+In the third block, the statement block is executed if <expr> is between <exp5> and <exp6> (inclusive). This works with numeric types only.
+
+If one of the ''CASE'' expressions is tested to be true, the statement block will be executed and control will be passed to the code after ''END SELECT''. That is to say, at most one statement block will be executed. 
+
+If none of the ''CASE'' expressions is tested to be true, control will be passed to ''CASE ELSE'' (if it exists).
+===== Example =====
+
+  DIM a$ AS STRING * 3
+  again:
+  INPUT "your age? ";a$
+  age = VAL(a$)
+  SELECT CASE age
+    CASE 0, 1
+      PRINT "baby"
+    CASE 2, 3
+      PRINT "toddler"
+    CASE 4 TO 10
+      PRINT "child"
+    CASE 11 TO 17
+      PRINT "teenager"
+    CASE IS >= 18
+      PRINT "adult"
+    CASE ELSE
+      PRINT "invalid value"
+      GOTO again
+  END SELECT
+
+===== See also =====
+
+  * [[IF]]

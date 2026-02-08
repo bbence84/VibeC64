@@ -1,0 +1,45 @@
+====== SWAP ======
+
+[pet] [vic20] [c64] [c16] [cplus4] [c128] [x16] [m65]
+
+The ''SWAP'' command is used to exchange the values of two variables.
+
+===== Syntax =====
+
+  SWAP <left>, <right>
+
+After the operation, the variable //left// will have the value of //right// and vice versa.
+
+<adm warning>
+The two variables can be of any type, but their types must be the same.
+</adm>
+
+===== Example =====
+
+The ''SWAP'' command is especially useful in sorting algorithms:
+
+  REM -- Bubble sort 10 random long numbers --
+  
+  CONST TRUE = 255
+  CONST FALSE = 0
+  
+  DIM nums(10) AS LONG
+  DIM swapped AS BYTE FAST
+  DIM i AS BYTE FAST
+  DIM j AS BYTE FAST
+  
+  RANDOMIZE TI()
+  FOR i = 0 TO 9 : nums(i) = RNDL() : NEXT
+  
+  swapped = FALSE
+  FOR i = 0 TO 8
+      FOR j = 0 TO 8 - i
+          IF nums(j) > nums(j + 1) THEN
+            SWAP nums(j), nums(j + 1)
+            swapped = TRUE
+          END IF
+      NEXT j
+      IF swapped = FALSE THEN EXIT FOR
+  NEXT i
+  
+  FOR i = 1 TO 9 : PRINT nums(i) : NEXT

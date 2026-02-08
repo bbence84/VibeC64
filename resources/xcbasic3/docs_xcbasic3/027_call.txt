@@ -1,0 +1,30 @@
+====== CALL ======
+
+[pet] [vic20] [c64] [c16] [cplus4] [c128] [x16] [m65]
+
+The ''CALL'' command executes a [[v3:subroutines|subroutine]].
+
+===== Syntax =====
+
+  CALL <subroutine_name> ([<param> [, <param>, ...]])
+
+The called subroutine must be defined or forward declared before it can be called. See the [[v3:subroutines]] page for more information.
+
+===== Example =====
+
+  CONST LT_BLUE = 14
+  
+  REM ** Clears the screen and sets color **
+  SUB cls (color AS BYTE) STATIC
+    MEMSET $0400, 1000, 32
+    MEMSET $d800, 1000, color
+  END SUB
+  
+  REM ** Call the routine **
+  CALL cls (LT_BLUE)
+  PRINT "screen cleared"
+
+===== See also =====
+
+  * [[v3:subroutines|]]
+

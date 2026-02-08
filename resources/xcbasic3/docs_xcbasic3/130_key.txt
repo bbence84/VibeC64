@@ -1,0 +1,21 @@
+====== KEY ======
+
+[pet] [vic20] [c64] [c16] [cplus4] [c128]
+
+The ''KEY()'' function tests whether a specified key is being depressed on the keyboard.
+
+===== Function declaration =====
+
+  DECLARE FUNCTION _
+  KEY AS BYTE (scancode AS WORD) SHARED STATIC INLINE
+
+For the list of scan codes on particular platforms, see [[v3:keyboard_scancodes|]].
+
+===== Example =====
+
+  CONST Q = 32576 ' scan code for Q key
+  PRINT "press Q key to quit program"
+  DO : LOOP UNTIL KEY(Q)
+  PRINT "good bye"
+  END
+

@@ -1,0 +1,11 @@
+====== NOT ======
+
+[pet] [vic20] [c64] [c16] [cplus4] [c128] [x16] [m65]
+
+The unary ''NOT'' operator performs a bitwise negation operation.
+
+===== Syntax =====
+
+  NOT <expression>
+
+The expression can be any type of numeric expression, except FLOAT.

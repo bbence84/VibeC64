@@ -1,0 +1,23 @@
+====== RNDI ======
+
+The ''RNDI()'' function returns a pseudo-random 16-bit signed number, between -32,768 and 32,767.
+
+===== Function header =====
+
+  DECLARE FUNCTION RNDI AS INT () SHARED STATIC INLINE
+
+===== Example =====
+
+  ' Display a sequence of 10 random numbers
+  RANDOMIZE TI()
+  FOR i AS BYTE = 1 TO 10
+    PRINT RNDI()
+  NEXT
+
+===== See also =====
+
+  * [[RANDOMIZE]]
+  * [[RNDB]]
+  * [[RNDW]]
+  * [[RNDL]]
+  * [[v3:rnd|]]

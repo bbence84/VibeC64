@@ -1,0 +1,13 @@
+====== LOCATE ======
+
+[vic20] [c64] [c16] [cplus4] [c128] [x16] [m65]
+
+The ''LOCATE'' command is used to set the cursor position.
+
+===== Syntax =====
+
+  LOCATE <x_pos>, <y_pos>
+
+<adm warning>
+This command does not work on the Commodore PET.
+</adm>

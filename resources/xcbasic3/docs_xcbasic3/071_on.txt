@@ -1,0 +1,21 @@
+====== ON ======
+
+[pet] [vic20] [c64] [c16] [cplus4] [c128] [x16] [m65]
+
+The ''ON ... GOTO|GOSUB'' construct has multiple use cases:
+
+  * ''ON <value> GOTO|GOSUB'' is used for multiple branching
+  * ''ON ERROR GOTO'' is used for error trapping
+  * ''ON <event> GOSUB'' is used for interrupt handling
+
+===== Syntax =====
+
+  ON <value> GOTO|GOSUB <label> [, <label> ...]
+  ON ERROR GOTO <label>
+  ON TIMER|RASTER|SPRITE|BACKGROUND|VBLANK GOSUB <label>
+
+For more details, refer to:
+
+  * [[v3:flowcontrol|]]
+  * [[v3:error_handling|]]
+  * [[v3:interrupts|]]

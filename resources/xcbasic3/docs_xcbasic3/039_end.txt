@@ -1,0 +1,45 @@
+======END======
+
+[pet] [vic20] [c64] [c16] [cplus4] [c128] [x16] [m65]
+=====Syntax=====
+
+  END
+  END ASM
+  END FUNCTION
+  END IF
+  END SUB
+  END TYPE
+
+The ''END'' command terminates the execution of the program immediately. It can be used within the normal program flow and/or (optionally) at the very end of the program.
+
+The ''END'' keyword may also be used to mark the end of an [[ASM]], [[FUNCTION]], [[IF]], [[SUB]] or [[TYPE]] block. See the linked pages for details.
+===== Examples =====
+  ' print a common phrase and then terminate the program
+  PRINT "Hello, world!"
+  END
+  
+  ' terminate a program if a specific condition has been met
+  ' and continue on if not
+  DIM a AS TYPE BYTE
+  LET a = 5
+  PRINT "I just stopped in to see what condition my condition..."
+  IF a = 5 THEN
+      PRINT "...was in."
+      END
+  ELSE
+      PRINT "...wasn't in."
+  END IF
+  PRINT "If you can read this, I wasn't in the correct condition."
+  END
+  
+In the first example above, the ''END'' statement terminates the program after the ''PRINT'' statement.
+
+<adm note>
+The ''END'' statement is optional if positioned at the end of the program's running code and logic flow.
+</adm>
+
+In the second example, because the condition specified in the ''IF'' statement is ''TRUE'' at runtime, the program terminates immediately following ''PRINT "...was in."'' and no additional code is executed.
+
+=====See Also=====
+  * [[v3:GOSUB]]
+  * [[v3:GOTO]]

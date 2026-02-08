@@ -1,0 +1,33 @@
+====== GET ======
+
+[pet] [vic20] [c64] [c16] [cplus4] [c128] [x16] [m65]
+===== Syntax =====
+
+  GET <variable>
+
+The ''GET'' commands reads a single character from the keyboard buffer and assigns it to the given variable.
+
+  * If the variable is a of a numeric type, it will be assigned the numeric PETSCII code of the character,
+  * If the variable is a ''STRING'', it will be assigned the character itself, as string.
+
+<adm warning>
+The variable must be pre-defined.
+</adm>
+
+===== Example =====
+
+Waiting for a key in the buffer:
+
+  DIM a$ AS STRING * 1
+  DO
+    GET a$
+  LOOP UNTIL LEN(a$) > 0
+  PRINT "you pressed: "; a$
+
+Or a simpler equivalent:
+
+  DIM a AS BYTE
+  DO
+    GET a
+  LOOP UNTIL a > 0
+  PRINT "you pressed: "; CHR$(a)

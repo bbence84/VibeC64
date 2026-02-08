@@ -1,0 +1,21 @@
+====== SCAN ======
+
+[vic20] [c64] [c16] [cplus4] [c128] [x16] [m65]
+
+The ''SCAN()'' function tells which scan line is currently draw on the screen.
+
+===== Function declaration =====
+
+  DECLARE FUNCTION _
+  SCAN AS WORD () SHARED STATIC INLINE
+
+===== Example =====
+
+  ' A simple raster effect
+  SYSTEM INTERRUPT OFF
+  start:
+  DO : LOOP WHILE SCAN() < 160
+  BORDER 3
+  DO : LOOP WHILE SCAN() > 10
+  BORDER 0
+  GOTO start

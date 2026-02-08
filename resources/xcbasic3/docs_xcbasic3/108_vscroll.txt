@@ -1,0 +1,18 @@
+====== VSCROLL ======
+
+[c64] [c16] [cplus4] [c128] [x16] [m65]
+
+Sets the vertical smooth scrolling value.
+
+===== Syntax =====
+
+  ' On all Commodore platforms:
+  VSCROLL <px>
+  ' On the Commander X16:
+  VSCROLL <layer>, <px> 
+
+  * On [c64] [c16] [cplus4] [c128] [m65], ''<px>'' is a value between 0 and 7. The default scroll value is 3. Values bellow this will move the screen upwards, values above this will move it downwards.
+  * On the [x16], ''<layer>'' is a literal 0 or 1 specifying which layer to scroll. ''<px>'' is a value between 0 and 4095.
+===== See also =====
+
+  * [[HSCROLL]]

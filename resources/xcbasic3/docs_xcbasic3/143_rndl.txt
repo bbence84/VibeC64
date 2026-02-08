@@ -1,0 +1,23 @@
+====== RNDL ======
+
+The ''RNDL()'' function returns a pseudo-random 24-bit signed number, between -8,388,608 and 8,388,607.
+
+===== Function header =====
+
+  DECLARE FUNCTION RNDL AS LONG () SHARED STATIC INLINE
+
+===== Example =====
+
+  ' Display a sequence of 10 random numbers
+  RANDOMIZE TI()
+  FOR i AS BYTE = 1 TO 10
+    PRINT RNDL()
+  NEXT
+
+===== See also =====
+
+  * [[RANDOMIZE]]
+  * [[RNDB]]
+  * [[RNDI]]
+  * [[RNDW]]
+  * [[v3:rnd|]]

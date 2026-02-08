@@ -1,0 +1,6 @@
+====== RETURN ======
+
+The ''RETURN'' keyword can be used:
+
+  * To return control after the last [[GOSUB]] statement
+  * To return a value from a [[FUNCTION]]

@@ -1,0 +1,17 @@
+====== INCBIN ======
+
+[pet] [vic20] [c64] [c16] [cplus4] [c128] [x16] [m65]
+
+Include raw binary data in the compiled program.
+
+===== Syntax =====
+
+  INCBIN "path/to/binary_file"
+
+The ''INCBIN'' directive instructs the assembler to include a custom binary file. This is useful to include graphics, music or any kind of data - even machine code routines - in your program. The included file must be a path relative to the folder where the code module is.
+
+<adm warning>
+Be very careful, as the binary stream will be injected into the program right at the point where the compiler encounters the directive. Make sure that the included data is outside the program flow (unless it's meant to be there).
+</adm>
+
+Although the compiler will let you know the exact addresses where the included files got assembled within the final executable, these addresses may be changing. In most cases you will want to use ''INCBIN'' in combination with [[ORIGIN]] to make sure that your included binaries are always located at the same address.

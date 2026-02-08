@@ -1,0 +1,20 @@
+====== LEFT$ ======
+
+The ''LEFT$()'' function returns the specified number of characters from the left side of a string.
+
+===== Syntax =====
+
+  LEFT$(<input$>, <n>)
+
+<n> is the number of chars to be returned. If it is greater than the string length then the entire string will be returned.
+
+===== Example =====
+
+  DIM in$ AS STRING * 30
+  in$ = "xc=basic programming language"
+  PRINT LEFT$(in$, 8) : REM outputs: xc=basic
+
+===== See also =====
+
+  * [[v3:right|]]
+  * [[v3:mid|MID$]]

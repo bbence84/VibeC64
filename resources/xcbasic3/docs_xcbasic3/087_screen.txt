@@ -1,0 +1,44 @@
+====== SCREEN ======
+
+[c64] [c128]
+
+The ''SCREEN'' command switches between multiple logical screens by changing the Video Matrix Base Address.
+
+===== Syntax =====
+
+  SCREEN <screen_number>
+
+Where ''<screen_number>'' must be a value between 0 and 15. The value multiplied by $0400 (decimal 1024) will be the new Base Address within the currently selected VIC bank. The default VIC bank is 0 and the default screen number is 1, therefore the default Base Address is $0400 (decimal 1024).
+
+<adm note>
+The command has effect on the Commodore-64 and 128 only. To set the screen mode on the Commander X16, see [[VMODE]].
+</adm>
+
+<adm warning>
+The ''SCREEN'' command updates various KERNAL variables and pointer tables, which consumes considerable amount of CPU cycles and therefore it is not suitable for quickly switching between screens, for example when displaying double-buffered graphics. If speed is crucial in your program, consider simply using ''POKE'' to switch between screens.
+</adm>
+
+===== Example =====
+
+  DIM a$ AS STRING * 1
+  PRINT "this is screen 1"
+  PRINT "press key to switch"
+  REM save cursor position
+  x = POS() : y = CSRLIN()
+  REM wait for keypress
+  DO
+    GET a$
+  LOOP WHILE LEN(a$) = 0
+  REM switch screen
+  SCREEN 8
+  PRINT CHR$(147)
+  PRINT "this is screen 8"
+  PRINT "press key to go back"
+  REM wait for keypress
+  DO
+    GET a$
+  LOOP WHILE LEN(a$) = 0
+  SCREEN 1
+  REM restore cursor position
+  LOCATE x, y
+

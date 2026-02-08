@@ -1,0 +1,15 @@
+====== SPRITE CLEAR HIT ======
+
+[c64] [c128] [m65]
+
+Clears sprite collision status.
+
+===== Syntax =====
+
+  SPRITE CLEAR HIT
+
+Executing this command immediate before the [[SPRITEHIT]] and [[SPRITEBGHIT]] functions are checked, the immediate status is returned. Otherwise, the hit check functions will return if sprites were involved in a collision since the status was last cleared.
+
+===== See also =====
+
+  * [[SPRITE]]

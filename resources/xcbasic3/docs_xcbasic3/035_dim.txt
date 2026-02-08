@@ -1,0 +1,59 @@
+======DIM======
+
+[pet] [vic20] [c64] [c16] [cplus4] [c128] [x16] [m65]
+
+''DIM'' is used for defining variables and arrays.
+=====Syntax=====
+
+  DIM|STATIC [SHARED] [FAST] _
+  <variable name>[(<array dimensions>)] AS <type> [@<address>] _
+  [, <variable name>[(<array dimensions>)] AS <type> [@<address>] ... ] _
+  [SHARED] [FAST] 
+
+''DIM'' is used to explicitly define variables and assign them a type. Since XC=BASIC is a statically typed programming language, all variables must be defined before they can be used. While some variables can be auto-defined by the compiler without the use of the ''DIM'' statement (known as "implicit definition"), the use of ''DIM'' ensures the variable is defined as the intended type.
+
+  * The keyword is either ''DIM'' or ''STATIC''. The latter is used for defining a static variable in dynamic subroutines and functions. [[subroutines#static_vs_dynamic|Read more here]]
+  * Array dimensions are specified in parenthesis. The maximum number of dimensions is 3 and the maximum length of one dimension is 32768.
+  * The ''AS'' keyword is mandatory and the variable type must be defined. The type can be a numeric, string or user-defined type as well. If the variable is defined as string, the string length must be also given, for example ''DIM mystr$ AS STRING * 16''
+  * ''SHARED'' can be used to set the variable's visibility to shared, that means the variable is visible from within all code modules.
+  * The ''FAST'' keyword instructs the compiler to reserve space for the variable on the zero page, if available. If no more zero page space is available, the keyword will be ignored with a warning.
+  * If the ''@<address>'' is provided, the compiler will place the variable at the given address in memory. It can be either be:
+    * a numeric literal between 0 and $FFFF (65535).
+    * a constant
+    * a label
+
+
+
+===== Examples =====
+  ' define single variables
+  DIM enemy_count AS INT
+  DIM score AS DECIMAL
+  DIM gravity AS FLOAT
+  DIM name$ AS STRING * 16
+  
+  ' define multiple variables in a single statement,
+  ' all in the shared scope
+  DIM SHARED a AS INT, b AS WORD, c AS FLOAT
+  
+  ' dimension an array of 24 INT variables
+  DIM rockets(24) AS INT
+  
+  ' define a variable with explicit address
+  DIM my_var AS INT @ $C000
+  
+
+=====Additional Details=====
+
+<adm note>
+Refer to the [[v3:Variables]] page for more information on defining variables. Refer to the [[v3:datatypes]] page for more information on variable types and their use.
+</adm>
+=====See Also=====
+  * [[v3:INT]]
+  * [[v3:BYTE]]
+  * [[v3:WORD]]
+  * [[v3:LONG]]
+  * [[v3:FLOAT]]
+  * [[v3:DECIMAL]]
+  * [[v3:STRING]]
+  * [[v3:Variables]]
+  * [[v3:datatypes]]

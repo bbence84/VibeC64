@@ -1,0 +1,13 @@
+====== WAIT ======
+
+[pet] [vic20] [c64] [c16] [cplus4] [c128] [x16] [m65]
+
+The ''WAIT'' command is used to halt the program until the contents of a memory location changes in a specific way.
+
+===== Syntax =====
+
+  WAIT <address>, <mask> [, <trig>]
+
+The contents of the memory location are first exciusive-ORed with <trig> (if present), and then logically ANDed with <mask>. If the result is zero, the program goes back to that memory location and checks again. When the result is nonzero, the program continues with the next statement.
+
+Please read this [[https://www.atarimagazines.com/compute/issue32/076_1_ALL_ABOUT_COMMODORES_WAIT_INSTRUCTION.php|comprehensive article]] from Compute! Magazine for more information.

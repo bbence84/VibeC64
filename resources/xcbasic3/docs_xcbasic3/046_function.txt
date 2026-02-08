@@ -1,0 +1,24 @@
+====== FUNCTION ======
+
+[pet] [vic20] [c64] [c16] [cplus4] [c128] [x16] [m65]
+
+The ''FUNCTION'' keyword starts a function block.
+
+===== Syntax =====
+
+  FUNCTION <name> AS <type> ([<arg> AS <type>[, <arg> AS <type>]...]) [OVERLOAD] [PRIVATE|SHARED] [STATIC]
+    <statements>
+  END FUNCTION
+
+  * <name> must be a valid [[syntax#identifiers|identifer]]
+  * <type> must be provided and it must be a defined type (internal or user-defined)
+  * The argument list is optional, but the parenthesis ''()'' must be included
+  * The ''OVERLOAD'' keyword must be given if the function overloads another function with the same name
+  * If the function is defined in a [[TYPE]] block, the ''PRIVATE'' keyword indicates that the function may only be called from within that TYPE block.
+  * The ''SHARED'' keyword indicates that the function is visible from within other code modules
+  * The ''STATIC'' keyword indicates that no stack frame is allocated on each function call. See [[subroutines#static_vs_dynamic]]
+
+===== See also =====
+
+  * [[v3:subroutines|]]
+  * [[v3:functions|]]

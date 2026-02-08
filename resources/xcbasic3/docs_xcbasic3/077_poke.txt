@@ -1,0 +1,16 @@
+====== POKE ======
+
+[pet] [vic20] [c64] [c16] [cplus4] [c128] [x16] [m65]
+===== Syntax =====
+
+  POKE <address>, <value>
+
+The ''POKE'' command stores a value into the given memory address.
+===== Examples =====
+
+  REM ** turn border to black **
+  POKE 53280, 0
+ 
+===== See also =====
+
+  * [[v3:peek]]

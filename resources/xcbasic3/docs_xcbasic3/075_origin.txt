@@ -1,0 +1,45 @@
+====== ORIGIN ======
+===== Syntax =====
+
+  ORIGIN <address>
+
+The ''ORIGIN'' command instructs the assembler to compile subsequent code starting from an address other than the current address.
+
+  * If the new address is less than the current address, the program won't compile.
+  * If the new address is greater than the current address, the gap between the current and new address will be filled in with $FF bytes.
+
+The ''ORIGIN'' command can take a decimal or hexadecimal address. No variables, constants or expressions are allowed.
+
+===== Example =====
+
+  REM -- the program starts here
+  GOTO start
+  INCBIN "sprites.bin"
+  ORIGIN $3800
+  INCBIN "charset.bin"
+  ORIGIN $4000
+  start:
+    REM -- the actual code starts here
+    PRINT "welcome to my game"
+
+In the example above, sprite data will start right after the ''GOTO'' statement. The gap between the sprites and the charset will be filled with $FF-s.
+
+It is very important that the program code must never execute the empty gaps between the different "segments" that you define with ''ORIGIN'', because that would lead to a crash. Consider the following example:
+
+  REM -- segment #1
+  PRINT "hello world"
+  
+  ORIGIN $1000
+  REM -- segment #2
+  PRINT "hello again"
+	
+The above program will break if there is a gap between the two segments. The good practice is the following:
+
+  REM -- segment #1
+  PRINT "hello world"
+  GOTO seg2
+  
+  origin $1000
+  REM -- segment #2
+  seg2:
+  PRINT "hello again"

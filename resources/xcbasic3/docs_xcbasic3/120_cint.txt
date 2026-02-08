@@ -1,0 +1,17 @@
+====== CINT ======
+
+The ''CINT()'' function converts its argument to a signed 16-bit value.
+
+===== Function header =====
+
+  DECLARE FUNCTION CINT AS INT (number AS BYTE) SHARED STATIC INLINE
+  DECLARE FUNCTION CINT AS INT (number AS WORD) OVERLOAD SHARED STATIC INLINE
+  DECLARE FUNCTION CINT AS INT (number AS LONG) OVERLOAD SHARED STATIC INLINE
+  DECLARE FUNCTION CINT AS INT (number AS FLOAT) OVERLOAD SHARED STATIC INLINE
+
+If the argument is a ''LONG'', the number will be truncated to 16-bits. If the argument is a ''FLOAT'', it will be rounded and then converted to ''INTEGER''.
+
+===== Examples =====
+
+  PRINT CINT(65535) : REM converting WORD to INT. outputs -1
+  PRINT CINT(1001.4) : REM converting FLOAT TO INT. outputs 1001

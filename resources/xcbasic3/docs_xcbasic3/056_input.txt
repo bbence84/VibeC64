@@ -1,0 +1,10 @@
+====== INPUT ======
+
+[pet] [vic20] [c64] [c16] [cplus4] [c128] [x16] [m65]
+
+Read a string from the keyboard.
+===== Syntax =====
+
+  INPUT ["prompt";] <variable> [;]
+
+Variable must be a pre-defined ''STRING''.

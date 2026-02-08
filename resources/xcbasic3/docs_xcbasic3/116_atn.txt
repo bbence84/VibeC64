@@ -1,0 +1,24 @@
+====== ATN ======
+
+(Defined in //[[trigono.bas]]//)
+
+The ''ATN()'' function returns the arctangent of the argument. It is the inverse function of [[TAN]].
+
+===== Function header =====
+
+  DECLARE FUNCTION ATN AS FLOAT (x AS FLOAT) SHARED STATIC
+
+<adm warning>
+You must include the //TRIGONO.BAS// library in your program to be able to access this function.
+</adm>
+
+===== Example =====
+
+  INCLUDE "trigono.bas"
+  PRINT ATN(0.5) : REM will output 0.464088
+
+===== See also =====
+
+  * [[TAN]]
+  * [[SIN]]
+  * [[COS]]

@@ -1,0 +1,29 @@
+====== ST ======
+
+The ''ST()'' function returns the status after the last input-output operation, for example during a disk or tape read or write.
+
+===== Function header =====
+
+  DECLARE FUNCTION ST AS BYTE () SHARED STATIC INLINE
+
+===== Example =====
+
+  REM -- dump raw contents of a file
+  DIM char$ AS STRING * 1
+  CONST EOF = 64
+  OPEN 2, 8, 2, "filename"
+  DO WHILE ST() <> EOF
+    GET #2, char$
+    PRINT char$;
+  LOOP
+  CLOSE 2
+
+===== See also =====
+
+  * [[OPEN]]
+  * [[GET_hash|GET#]]
+  * [[INPUT_hash|INPUT#]]
+  * [[PRINT_hash|PRINT#]]
+  * [[READ]]
+  * [[WRITE]]
+  * [[CLOSE]]

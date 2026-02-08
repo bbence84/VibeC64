@@ -1,0 +1,30 @@
+====== SIN ======
+
+(Defined in //[[trigono.bas]]//)
+
+The ''SIN()'' function returns the sine of the argument.
+
+===== Function Header =====
+
+  DECLARE FUNCTION SIN AS FLOAT (x AS FLOAT) SHARED STATIC
+  
+<adm warning>
+You must include the //TRIGONO.BAS// library in your program to be able to access this function.
+</adm>
+
+
+===== Examples =====
+
+  INCLUDE "trigono.bas"
+  PRINT SIN(0) : REM outputs a number very close to zero, see the below note
+  PRINT SIN(0.785398) : REM outputs .707704
+
+<adm note>
+Trigonometric functions in XC=BASIC were designed to be fast rather than accurate. The result is accurate to 3 to 4 decimal digits (the error range is 0 to 0.0006). Please see [[http://www.ganssle.com/approx.htm|this article]] for details.
+</adm>
+
+===== See also =====
+
+  * [[TAN]]
+  * [[ATN]]
+  * [[COS]]

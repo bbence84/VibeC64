@@ -1,0 +1,31 @@
+====== @ (address of) ======
+
+[pet] [vic20] [c64] [c16] [cplus4] [c128] [x16] [m65]
+
+''@'' (address of) is a unary operator that resolves the memory address of a variable or label. The address is returned as a [[WORD]].
+
+===== Examples =====
+
+  DIM x AS INT
+  PRINT "x resides at address "; @x
+  
+  DIM y(3) AS LONG
+  PRINT "array member addresses: "; @y(0), @y(1), @y(2)
+  
+  mylab:
+  PRINT "this code piece starts at "; @mylab
+
+<adm note>
+If applied to a dynamic local variable, the ''@'' operator will return an address //relative to the current stack frame//.
+</adm>
+
+  SUB routine () ' Note this sub is not STATIC
+    DIM a AS INT
+    DIM b AS INT
+    STATIC c AS INT
+    PRINT @b ' Will output 2
+    PRINT @c ' Will output an absolute address
+  END SUB
+  
+  CALL routine()
+

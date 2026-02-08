@@ -1,3 +1,5 @@
+====== XC=BASIC 3.0 programming reference START ======
+
 ====== Syntax ======
 
 ===== Vocabulary =====
@@ -492,7 +494,9 @@ If you intend to manipulate strings directly, for example to examine and/or repl
 
 ...the memory area will be set like this (numbers in hexadecimal):
 
-{{:v3:str_hello.png?nolink&400|}}
+| | H | E | L | L | O | | | |
+|---|---|---|---|---|---|---|---|---|
+| 05 | 48 | 45 | 4C | 4C | 4F | | | |
 
 The first byte will contain the string length (five characters in this case) and the following 5 bytes will represent the encoded PETSCII characters. Since the fixed size of this string is 8 characters, but the actual string is only 5 characters long, the last three bytes are unused and their values are undefined and insignificant. However, XC=BASIC does not perform "garbage collection" like some others languages do, so those 3 bytes will remain in memory for the entire runtime of the program as unused space unless you alter the string by assigning a new value. Therefore, for the sake of efficient memory use, it is best to ensure all strings are defined to a length that is as short as possible for the needs of the program.
 
@@ -1116,3 +1120,1208 @@ Apart from the built-in errors, you can define your own error codes, too. You ca
   errhandler:
     IF ERR() = 99 THEN PRINT "my custom error occured" ELSE PRINT "other error"
 
+====== Interrupts ======
+
+[pet] [vic20] [c64] [c16] [cplus4] [c128] [x16] [m65]
+
+XC=BASIC allows you to set up interrupting rules and write routines that handle interrupts. The supported interrupt types are:
+
+  * **Timer interrupts**, issued after every <N> processor cycles where <N> is a value between 1 and 65535 (supported on all targets)
+  * **Raster interrupts**, issued when the screen raster line reached a certain position (supported on [c64] [c16] [cplus4] [c128] [x16] [m65])
+  * **Vertical blank interrupts**, issued when the screen is fully rendered (supported on [x16]) 
+  * **Sprite collision** interrupts, issued when two or more sprites collide ([c64] [c128] [x16] [m65])
+  * **Sprite-background collision** interrupts, issued when one ore more sprites collide with the background ([c64] [c128] [m65])
+
+<adm note>
+Multiple types of interrupts can be enabled at the same time, allowing your program a great flexibility of responding to events. If an interrupt is "missed" (because another one is currently served), it will be fired immediately after the current service routine is finished.
+</adm>
+
+<adm warning>
+Enabling multiple types of interrupts is not yet supported on the MEGA65.
+</adm>
+
+===== Defining interrupt service routines =====
+
+In order to respond to an interrupt request, you must first define what routine to pass control to when an interrupt is fired. If you don't do this, your program will not know what to do when an interrupt request is issued, so it will go to a random memory address and break. A service routine is nothing but a labelled code point in your program, the same that can be referenced by [[GOTO]] or [[GOSUB]]. For example:
+
+  irqserv:
+    ' Do whatever needs to be done when an interrupt request is issued
+    RETURN
+
+Once you have a service routine, you can reference it within an ''ON <event> GOSUB'' statement:
+
+  ON TIMER <cycles> GOSUB irqserv
+  ON RASTER <line> GOSUB irqserv
+  ON SPRITE GOSUB irqserv
+  ON BACKGROUND GOSUB irqserv
+  ON VBLANK GOSUB irqserv
+
+===== Enabling and disabling interrupts =====
+
+Once the service routines are defined and they're referenced in one or more ''ON <event> GOSUB'' statements, it is safe to enable interrupts:
+
+  TIMER INTERRUPT ON
+  RASTER INTERRUPT ON
+  SPRITE INTERRUPT ON
+  BACKGROUND INTERRUPT ON
+  VBLANK INTERRUPT ON
+
+If you no longer wish to fire interrupts, use the same commands with the ''OFF'' keywords:
+
+  TIMER INTERRUPT OFF
+  RASTER INTERRUPT OFF
+  SPRITE INTERRUPT OFF
+  BACKGROUND INTERRUPT OFF
+  VBLANK INTERRUPT OFF
+
+<adm warning>
+Make sure you you don't enable interrupts before the service routine is referenced in the corresponding ''ON <event> GOSUB'' statement, otherwise your program may break at the first interrupt.
+</adm>
+
+===== Enabling or disabling system background tasks =====
+
+By default, KERNAL runs some "background tasks" that are nothing but a timer interrupt service routine that typically does the following:
+
+  * Flash the cursor
+  * Query the keyboard (required by [[INPUT]] and [[GET]])
+  * Query the joysticks and mouse ([x16])
+  * Update the jiffy count (required by the [[TI]] function)
+
+If your program doesn't require the above, you can turn of the system interrupt service using the following command:
+
+  SYSTEM INTERRUPT OFF
+
+As you guessed, to turn it back on, you can use
+
+  SYSTEM INTERRUPT ON
+===== Restrictions =====
+
+Due to the nature of the runtime environment, there are some things that you must avoid in interrupt service routines:
+
+  - You must not call subs or functions
+  - You must not use floating point arithmetic
+  - You must not use the [[THIS]] keyword
+  - You must not enable or disable other interrupts (although changing their service routine using ''ON <event> GOSUB'' is allowed).
+
+Note that the above rules only apply to the service routine, not the rest of the program.
+
+===== You're driving: safe or fast? =====
+
+Another factor to take into consideration is speed. XC=BASIC reserves a few zero page locations to use as virtual registers. In order to return to the main program flow in a clean state after a service routine is done, the runtime environment must push these virtual registers on the stack before the service routine is entered and pull them back when it finished. This roughly takes 2 times 170 CPU cycles.
+
+You have two options:
+
+  - You accept this penalty, or
+  - If you're sure that your interrupt service routine doesn't mess up the virtual registers, you can declare ''OPTION FASTINTERRUPT'' at the top of your program, which will effectively bypass saving the virtual registers when the routine is entered.
+
+<adm note>
+Virtual registers reside on the zero page between addresses $02 and $0D, inclusive. You can use a machine language monitor to find out if these values were altered after an interrupt service routine was quit. If they weren't, you're good to go with ''OPTION FASTINTERRUPT''.
+</adm>  
+
+===== Examples =====
+
+==== Timer interrupt example ====
+
+The following example will display a counter on the top left corner of the screen while the rest of the program is running.
+
+  DIM i AS DECIMAL
+  i = 0000d
+  DIM a$ AS STRING * 8
+  
+  ON TIMER 10000 GOSUB irqserv
+  TIMER INTERRUPT ON
+  
+  INPUT "what is your name? "; a$
+  END
+  
+  ' This routine will be executed once in every 10,000 cpu cycles
+  irqserv:
+    TEXTAT 0, 0, i
+    i = i + 0001d
+    RETURN
+
+==== Raster interrupt example ====
+
+  ' Turn off swapping of virtual registers
+  ' as we don't use them in this example
+  OPTION FASTINTERRUPT
+   
+  BACKGROUND 0
+   
+  ' This will set up the first interrupt
+  GOSUB irqserv2
+   
+  SYSTEM INTERRUPT OFF
+  ' Go!
+  RASTER INTERRUPT ON
+   
+  ' Loop forever
+  DO : LOOP WHILE 1
+   
+  irqserv1:
+    BORDER 2
+    ON RASTER 120 GOSUB irqserv2
+    RETURN
+   
+  irqserv2:
+    BORDER 1
+    ON RASTER 100 GOSUB irqserv1
+    RETURN
+
+====== File I/O ======
+
+[vic20] [c16] [cplus4] [c64] [c128] [m65]
+
+File input-output in XC=BASIC was designed to be mostly compatible with CBM BASIC so that the same commands can be used for opening, reading from and writing to files. Since XC=BASIC is a strongly typed language, and therefore it comes with restrictions, there are some small differences to be aware of. Those differences are explained on each command's reference page.
+
+In addition, new commands have been added for binary writing and reading that allow convenient storing and recalling of simple or complex data structures, without the headache of encoding and decoding textual data.
+
+<adm warning>
+File I/O commands are not implemented for the Commodore PET.
+</adm>
+
+The following guide focuses on the differences between CBM BASIC and XC=BASIC rather than explaining how to use the commands that are compatible. The Commodore-64 and 1541 User Guides explain almost everything you need to know about the "traditional" file I/O commands.
+
+===== LOAD and SAVE =====
+
+CBM BASIC's ''LOAD'' and ''SAVE'' commands can store and recall either BASIC programs or binary data to and from a peripheral device (e. g tape or disk drive). XC=BASIC is compiled to machine language and therefore it doesn't make much sense to support loading and saving BASIC programs. For this reason, [[LOAD]] and [[SAVE]] in XC=BASIC are used for loading and saving binary data only. To save a particular memory area to disk or tape, you must use the following command:
+
+  SAVE <filename>, <device_no>, <start_address>, <end_address>
+  
+Let's say you want to store the memory contents at $8000-$83FF (that is, 1K of data) on disk, you can use the following command:
+
+  SAVE "mydata", 8, $8000, $83FF
+
+This will call the KERNAL function SAVE that will open the file and save the memory contents. The first two byte in the file will contain a pointer to the address $8000 so that ''LOAD'' will know where to recall data in memory if needed. These first two bytes are called the "load address".
+
+<adm note>
+You may use both decimal or hexadecimal numbers in XC=BASIC for specifying addresses and other numbers as well.
+</adm>
+
+When you wish to recall data from disk (or tape), you have two options: either you accept the load address in the file, or you specify a different address. To use the load address that is saved with the file, use the command:
+
+  LOAD <filename>, <device_no>
+
+Whereas to specify a different address:
+
+  LOAD <filename>, <device_no>, <destination_address>
+  
+The latter form allows you to recall data to a different address in memory. For example:
+
+  LOAD "mydata", 8, $C000
+
+The above command will read data that was saved above to a different address, in this case $C000-$C3FF.
+
+<adm warning>
+If the destination address is specified in a ''LOAD'' statement, the first two bytes of the file will always be discarded, regardless of whether they were intended to serve as a load address or they're part of the actual data.
+</adm>
+
+===== READ and WRITE =====
+
+The ''PRINT#'' and ''INPUT#'' commands in CBM BASIC work with PETSCII-encoded data. XC=BASIC also supports [[PRINT_hash]] and [[INPUT_hash]], and they behave almost exactly the same, which means that data saved in CBM BASIC should be readable in XC=BASIC and vice versa.
+
+Apart from that, XC=BASIC supports reading and writing binary data. This means that any variable is written to a file will be written using the exact same binary representation as the variable's value is stored in memory. Binary output and input therefore allows you to save and restore data just as they are, without conversion.
+
+The other advantage of binary I/O is that you can save and restore complex data structures (see [[udt]]) easily, in one go. Check out the following example:
+
+  TYPE GAMESTATE
+    playername$ AS STRING * 8
+    score AS DECIMAL
+    level AS BYTE
+    monsterscount AS INT
+  END TYPE
+  
+  DIM state AS GAMESTATE
+  
+  REM -- save the game!
+  OPEN 2,8,2,"savegame,s,w"
+  WRITE #2, state
+  CLOSE 2
+  
+  REM -- load a saved game!
+  OPEN 2,8,2,"savegame,s,r"
+  READ #2, state
+  CLOSE 2
+
+This convenience comes with a cost: you must take extra care with the data types when using ''READ#'' and ''WRITE#''. Since only the data is saved to the file, not the data type, ''READ#'' can only rely on what type of variable you specified as its argument(s). If the data is not the same type as the variable, you'll face unwanted behavior, as in the following example:
+
+  OPEN 2, 8, 2, "myfile,s,w" : REM open file for writing
+  WRITE #2, 5, 6, 7 : REM write the numbers 5, 6 and 7 (3 bytes all together)
+  CLOSE 2
+  
+  DIM a AS INT : REM note a, b and c are integers
+  DIM b AS INT
+  DIM c AS INT
+  
+  OPEN 2, 8, 2, "myfile,s,r" : REM open file for reading
+  READ #2, a, b, c : REM this will try to read 6 bytes
+  PRINT a, b, c
+  CLOSE 2
+
+In the example above we specify the literal numbers 5, 6 and 7 as output data. The compiler will conclude the data type by looking at the numbers and it will treat them as BYTE type [[datatypes#numeric_literals|as per these rules]]. The ''READ #2, a, b, c'' statement however will try to fetch 2 bytes per each variable, resulting in wrong values.
+
+<adm warning>
+Use the type conversion functions [[CBYTE]], [[CINT]], [[CWORD]], [[CLONG]] and [[CFLOAT]] to make sure that the correct data type is output.
+</adm>
+====== Keyboard scancodes ======
+
+Use the following values as parameters passed to the [[KEY]] function to detect if a key is pressed on the keyboard.
+
+| Key | C-64 / C-128 |
+| :--- | :--- |
+| * | 48898 |
+| + | 57089 |
+| , | 57216 |
+| - | 57152 |
+| . | 57104 |
+| / | 49024 |
+| : | 57120 |
+| ; | 48900 |
+| = | 48928 |
+| @ | |
+| A | 64772 |
+| B | 63248 |
+| C | 64272 |
+| CBM | 32544 |
+| CRSR DN | 65152 |
+| CRSR LT | |
+| CRSR RT | 65028 |
+| CRSR UP | |
+| CTRL | 32516 |
+| D | 64260 |
+| DEL | 65025 |
+| E | 64832 |
+| ESC | |
+| F | 64288 |
+| F1/F2 | 65040 |
+| F1/F4 | |
+| F2/F5 | |
+| F3/6 | |
+| F3/F4 | 65056 |
+| F5/F6 | 65088 |
+| F7/F8 | 65032 |
+| 0 | 61192 |
+| G | 63236 |
+| H | 63264 |
+| HELP/F7 | |
+| HOME | 48904 |
+| I | 61186 |
+| J | 61188 |
+| K | 61216 |
+| L | 57092 |
+| LSHIFT | 64896 |
+| M | 61200 |
+| N | 61312 |
+| O | 61248 |
+| P | 57090 |
+| Q | 32576 |
+| R | 64258 |
+| RETURN | 65026 |
+| RSHIFT | 48912 |
+| S | 64800 |
+| SHIFT | |
+| SPACE | 32528 |
+| STOP | 32640 |
+| T | 64320 |
+| U | 63296 |
+| V | 63360 |
+| W | 64770 |
+| X | 64384 |
+| Y | 63234 |
+| Z | 64784 |
+| £ | 48897 |
+| ← | 32514 |
+| ↑ | 48960 |
+| 1 | 32513 |
+| 2 | 32520 |
+| 3 | 64769 |
+| 4 | 64776 |
+| 5 | 64257 |
+| 6 | 64264 |
+| 7 | 63233 |
+| 8 | 63240 |
+| 9 | 61185 |
+Here is a detailed reference guide for XC=BASIC keywords and functions supported on the Commodore 64. All non-C64 references have been removed to provide a focused guide for C64 development.
+
+---
+
+### **@ (Address Of)**
+
+The `@` symbol is a unary operator used to retrieve the memory address of a variable, array, or label.
+
+*   **Syntax:** `@<variable_name>`
+*   **Returns:** A `WORD` representing the 16-bit address.
+
+**Use:**
+This is primarily used when you need to pass the location of a variable to machine code routines (`SYS`), or when manipulating data using `PEEK`/`POKE` based on variable storage.
+
+**Corner Cases:**
+*   **Dynamic Variables:** If applied to a dynamic local variable (inside a non-static `SUB` or `FUNCTION`), the operator returns an address **relative to the current stack frame**, not an absolute memory address.
+*   **Static Variables:** If applied to a `STATIC` variable (even inside a dynamic sub), it returns the absolute address.
+
+**Example:**
+```basic
+DIM x AS INT
+PRINT "x resides at address "; @x
+
+' Retrieving array element addresses
+DIM y(3) AS LONG
+PRINT "array member addresses: "; @y(0), @y(1), @y(2)
+
+' Retrieving a code label address to use with a jump table or manual pointer
+mylab:
+PRINT "this code piece starts at "; @mylab
+```
+
+---
+
+### **ABS**
+
+Returns the absolute (positive) value of a numeric expression.
+
+*   **Syntax:** `ABS(<expression>)`
+*   **Returns:** Same numeric type as the input (`BYTE`, `INT`, `WORD`, `LONG`, or `FLOAT`).
+
+**Example:**
+```basic
+PRINT ABS(-1)    ' Prints 1
+PRINT ABS(1)     ' Prints 1
+DIM n AS INT
+n = -5400
+PRINT ABS(n)     ' Prints 5400
+```
+
+---
+
+### **AND**
+
+Performs a bitwise AND operation on two numbers.
+
+*   **Syntax:** `<operand1> AND <operand2>`
+*   **Returns:** Numeric result of the bitwise operation.
+
+**Use:**
+Often used for masking bits. For example, checking if specific bits in a hardware register are set.
+
+**Corner Cases:**
+*   Operands can be any numeric type **except** `FLOAT`.
+
+**Example:**
+```basic
+PRINT 1 AND 0        ' Output: 0
+PRINT 255 AND 15     ' Output: 15
+
+' Check if bit 4 (value 16) is set in a joystick register
+IF (JOY(1) AND 16) = 16 THEN PRINT "Fire button pressed"
+```
+
+---
+
+### **ASC**
+
+Returns the PETSCII numeric code of the first character of a string.
+
+*   **Syntax:** `ASC(<string>)`
+*   **Returns:** `BYTE`.
+
+**Corner Cases:**
+*   If the input string is empty (`""`), the function returns `0`.
+*   Only considers the first character; subsequent characters are ignored.
+
+**Example:**
+```basic
+PRINT ASC("a")   ' Output: 65
+PRINT ASC("abc") ' Output: 65
+PRINT ASC("")    ' Output: 0
+```
+
+---
+
+### **ASM**
+
+Injects inline 6502 assembly code directly into the output. The compiler passes this code verbatim to the *dasm* assembler.
+
+*   **Syntax:**
+    ```basic
+    ASM
+      <assembly code>
+    END ASM
+    ```
+
+**Use:**
+Used for timing-critical code (like raster bars) or accessing specific hardware features not exposed by BASIC.
+
+**Details:**
+*   **Formatting:** Lines must start with a label or at least one whitespace character (standard *dasm* syntax).
+*   **Variable Access:** You can access static BASIC variables using `{variable_name}` syntax.
+*   **Strings:** XC=BASIC strings are not zero-terminated (they have a length byte). To use strings in ASM (e.g., for KERNAL calls), you must manually create a zero-terminated array or handle the length byte.
+
+**Warning:**
+*   The compiler does not validate ASM code. Errors will be reported by *dasm*.
+*   Only `STATIC` variables can be referenced via `{}`.
+
+**Example:**
+```basic
+SUB SetBorderBlack () STATIC
+  DIM temp AS BYTE
+  temp = 0
+  ASM
+    lda {temp}
+    sta $D020  ; Write 0 to Border Color register
+  END ASM
+END SUB
+```
+
+---
+
+### **ATN**
+
+Returns the arctangent of a number.
+
+*   **Syntax:** `ATN(<float>)`
+*   **Returns:** `FLOAT`.
+
+**Corner Case:**
+*   You must include the math library: `INCLUDE "trigono.bas"`.
+
+**Example:**
+```basic
+INCLUDE "trigono.bas"
+PRINT ATN(0.5) ' Outputs 0.464088
+```
+
+---
+
+### **BACKGROUND**
+
+Sets the screen background color using the standard C64 color palette (0-15).
+
+*   **Syntax:** `BACKGROUND <color>`
+
+**Details:**
+*   Updates the VIC-II background color register ($D021).
+*   Valid colors are 0 (Black) through 15 (Light Grey).
+
+**Example:**
+```basic
+CONST BLACK = 0
+CONST WHITE = 1
+BORDER BLACK : BACKGROUND WHITE
+```
+
+---
+
+### **BORDER**
+
+Sets the screen border color using the standard C64 color palette (0-15).
+
+*   **Syntax:** `BORDER <color>`
+
+**Details:**
+*   Updates the VIC-II border color register ($D020).
+*   Valid colors are 0 (Black) through 15 (Light Grey).
+
+**Example:**
+```basic
+BORDER 2     ' Red border
+BORDER 14    ' Light Blue border
+```
+
+---
+
+### **CHARAT**
+
+Draws a character code directly to a specific coordinate on the screen memory. It does not update the cursor position.
+
+*   **Syntax:** `CHARAT <x>, <y>, <screencode> [, <color>]`
+
+**Details:**
+*   **<x>, <y>:** Coordinates (0-based). 0-39 for X, 0-24 for Y.
+*   **<color>:** Optional (0-15). If provided, it updates Color RAM at that position. If omitted, the color remains whatever was previously there.
+*   **Unsafe:** No bounds checking is performed. Writing outside 0-39 or 0-24 will write to adjacent memory.
+
+**Example:**
+```basic
+' Put 'A' (screen code 1) at column 20, row 10
+CHARAT 20, 10, 1
+
+' Put 'B' (screen code 2) at top-left, in Yellow (7)
+CHARAT 0, 0, 2, 7
+```
+
+---
+
+### **CHARSET**
+
+Instructs the VIC-II chip where to look for character data (font).
+
+*   **Syntax:** `CHARSET <value>`
+
+**Calculation:**
+The address is calculated as `<value> * $800` (2048 bytes), relative to the currently selected VIC bank (default Bank 0).
+
+**Common Values (Bank 0):**
+*   `CHARSET 2`: Standard ROM Upper case / Graphics ($1000 offset, points to ROM).
+*   `CHARSET 3`: Standard ROM Lower case / Upper case ($1800 offset, points to ROM).
+*   `CHARSET 4`: RAM at $2000.
+*   `CHARSET 5`: RAM at $2800.
+
+**Example:**
+```basic
+' Switch to Upper/Lower case mode
+CHARSET 3 
+
+' Switch to custom font loaded at $2000
+CHARSET 4
+```
+
+---
+
+### **CONST**
+
+Defines a named value that exists only at compile-time. It is replaced by the literal value in the binary.
+
+*   **Syntax:** `[SHARED] CONST <name> = <numeric_literal>`
+
+**Use:**
+Excellent for defining hardware registers, colors, or game constants to make code readable without using memory variables.
+
+**Details:**
+*   Does not consume RAM.
+*   Use `SHARED` to make it visible across multiple source files (`INCLUDE`s).
+
+**Example:**
+```basic
+CONST VIC_BORDER = $D020
+CONST RED = 2
+POKE VIC_BORDER, RED
+```
+
+---
+
+### **DATA**
+
+Defines a block of static data in the program.
+
+*   **Syntax:** `DATA AS <type> <value> [, <value> ...]`
+
+**Use:**
+XC=BASIC does not use `READ`. Instead, you point a `DIM` array to the `DATA` label using the `@` syntax. This effectively initializes an array with static data.
+
+**Details:**
+*   **Strings:** Must define max length, e.g., `DATA AS STRING * 5`. Shorter strings are zero-padded; longer strings are truncated.
+*   **Inlining:** By default, data is stored in a separate segment. Use `OPTION INLINEDATA` to place it in program flow (ensure you `GOTO` over it to prevent the CPU from executing data).
+
+**Example:**
+```basic
+' Accessing data via array
+DIM squares(3) AS INT @lab_squares
+PRINT squares(3) ' Outputs 9
+
+lab_squares:
+DATA AS INT 0, 1, 4, 9
+```
+
+---
+
+### **DEEK**
+
+Reads a 16-bit word from memory (Little Endian: reads `addr` and `addr+1`).
+
+*   **Syntax:** `DEEK(<address>)`
+*   **Returns:** `WORD` (0-65535).
+
+**Use:**
+Useful for reading 16-bit pointers (like vector tables) or hardware registers that are paired.
+
+**Example:**
+```basic
+' Reads the BASIC start of variables pointer ($2D-$2E)
+PRINT DEEK($002D)
+```
+
+---
+
+### **DIM**
+
+Defines a variable or array.
+
+*   **Syntax:**
+    `DIM|STATIC [SHARED] [FAST] <name>[(dims)] AS <type> [@<address>]`
+
+**Keywords:**
+*   **STATIC:** Use this instead of `DIM` inside dynamic subs to retain value between calls.
+*   **SHARED:** Makes variable visible to all modules.
+*   **FAST:** Requests storage in the Zero Page (faster access). Ignored if ZP is full.
+*   **@ <address>:** Maps the variable to a specific memory address or label. Useful for memory mapping hardware registers (e.g., VIC-II registers).
+
+**Types:** `BYTE`, `INT` (signed 16-bit), `WORD` (unsigned 16-bit), `LONG` (signed 24-bit), `FLOAT` (32-bit), `DECIMAL` (BCD), `STRING * length`.
+
+**Example:**
+```basic
+DIM x AS BYTE
+DIM arr(10) AS INT
+' Map a variable directly to the border color register
+DIM border_reg AS BYTE @ $D020 
+border_reg = 0 ' Sets border to black
+```
+
+---
+
+### **DO ... LOOP**
+
+Defines a loop that repeats indefinitely or based on a condition.
+
+*   **Syntax (Pre-test):** `DO WHILE|UNTIL <cond> ... LOOP`
+*   **Syntax (Post-test):** `DO ... LOOP WHILE|UNTIL <cond>`
+
+**Details:**
+*   **Post-test** guarantees the loop runs at least once.
+*   Use `EXIT DO` to break.
+*   Use `CONTINUE DO` to skip to the next iteration.
+
+**Example:**
+```basic
+DIM i AS BYTE
+DO
+  i = i + 1
+  PRINT i
+LOOP UNTIL i = 10
+```
+
+---
+
+### **DOKE**
+
+Writes a 16-bit word to memory (Little Endian).
+
+*   **Syntax:** `DOKE <address>, <value>`
+
+**Use:**
+Writes the low byte of `<value>` to `<address>` and the high byte to `<address>+1`. Useful for setting pointers.
+
+**Example:**
+```basic
+' Set the top of BASIC memory pointer ($37-$38) to $4000
+DOKE $0037, $4000
+```
+
+---
+
+### **FILTER**
+
+Sets SID sound filter properties.
+
+*   **Syntax:** `FILTER [<sid_num>] <subcmd> ...`
+
+**Subcommands:**
+*   `CUTOFF <0-2047>`: Sets filter cutoff frequency.
+*   `RESONANCE <0-15>`: Sets resonance.
+*   `LOW PASS`, `BAND PASS`, `HIGH PASS`: Enables specific filter modes.
+
+**Details:**
+*   `<sid_num>` is optional (defaults to 1). Used for systems with dual SIDs.
+
+**Example:**
+```basic
+' Set cutoff to approx mid-range, max resonance, low pass filter
+FILTER CUTOFF 1000 RESONANCE 15 LOW PASS
+```
+
+---
+
+### **FOR ... NEXT**
+
+Standard counting loop.
+
+*   **Syntax:**
+    `FOR <var> [AS <type>] = <start> TO <end> [STEP <step>] ... NEXT`
+
+**Corner Cases & Warnings:**
+*   **Unsigned Countdown:** You cannot loop downwards (`STEP -1`) if the counter variable is unsigned (`BYTE` or `WORD`). It will wrap around (underflow) and loop infinitely. Use `INT` or a `DO` loop for countdowns.
+*   **Static Counter:** Loop counters are always `STATIC`. You cannot use a dynamic local variable as a `FOR` counter.
+
+**Example:**
+```basic
+FOR i AS INT = 10 TO 0 STEP -1
+  PRINT i
+NEXT
+```
+
+---
+
+### **GET**
+
+Reads a single character from the keyboard buffer.
+
+*   **Syntax:** `GET <variable>`
+
+**Behavior:**
+*   If `<variable>` is Numeric: Returns the PETSCII code (0 if buffer empty).
+*   If `<variable>` is String: Returns the character (Empty string if buffer empty).
+
+**Example:**
+```basic
+DIM k AS BYTE
+DO
+  GET k
+LOOP UNTIL k <> 0 ' Wait for any key press
+```
+
+---
+
+### **HSCROLL**
+
+Sets horizontal hardware scrolling (VIC-II register $D016).
+
+*   **Syntax:** `HSCROLL <pixels>`
+
+**Details:**
+*   Accepts values 0-7.
+*   Shifts the entire screen display by that many pixels.
+*   Usually combined with `VMODE ... COLS 38` to hide the edges where scrolling artifacts appear.
+
+**Example:**
+```basic
+HSCROLL 4 ' Shift screen by 4 pixels
+```
+
+---
+
+### **IF**
+
+Conditional Logic.
+
+*   **Syntax (Single Line):** `IF <cond> THEN <stmt> [ELSE <stmt>]`
+*   **Syntax (Block):**
+    ```basic
+    IF <cond> THEN
+      <statements>
+    ELSE
+      <statements>
+    END IF
+    ```
+
+**Details:**
+*   Condition is True if it evaluates to any non-zero number.
+*   Comparisons (e.g., `x > 5`) return 255 for True and 0 for False.
+
+---
+
+### **INPUT**
+
+Reads a string from the user via keyboard.
+
+*   **Syntax:** `INPUT ["prompt";] <string_var>`
+
+**Example:**
+```basic
+DIM name$ AS STRING * 20
+INPUT "What is your name? "; name$
+```
+
+---
+
+### **INPUT#**
+
+Reads comma-separated string data from a file (Disk/Tape).
+
+*   **Syntax:** `INPUT #<file_no>, <var> [, <var>...]`
+
+**Details:**
+*   Recognizes comma `,` as a separator.
+*   Respects quote `"` marks (commas inside quotes are treated as literal text).
+*   Compatible with data written via `PRINT#`.
+
+---
+
+### **INTERRUPTS (ON ... GOSUB)**
+
+Defines routines to handle hardware interrupts.
+
+*   **Syntax:** `ON <event> GOSUB <label>`
+*   **Events:** `TIMER` (CIA Timer), `RASTER` (VIC-II Raster Line), `SPRITE` (Sprite-Sprite collision), `BACKGROUND` (Sprite-Background collision).
+
+**Usage:**
+1.  Define the handler: `ON RASTER 100 GOSUB my_irq`.
+2.  Enable specific interrupt: `RASTER INTERRUPT ON`.
+3.  (Optional) Disable system defaults: `SYSTEM INTERRUPT OFF` (Stops cursor blink, keyboard scanning).
+
+**Constraints in ISR (Interrupt Service Routine):**
+*   No floating point math.
+*   No `SUB`/`FUNCTION` calls.
+*   No `THIS` keyword.
+*   Use `OPTION FASTINTERRUPT` to skip saving virtual registers if you are sure your ISR is safe (optimization).
+
+**Example:**
+```basic
+ON RASTER 100 GOSUB split_screen
+RASTER INTERRUPT ON
+DO : LOOP ' Infinite loop
+
+split_screen:
+  BORDER 2 ' Change border to red at line 100
+  RETURN
+```
+
+---
+
+### **JOY**
+
+Returns the status of a joystick.
+
+*   **Syntax:** `JOY(<port>)`
+*   **Returns:** `BYTE` bitmask.
+
+**Details:**
+*   `<port>`: 1 or 2.
+*   **Bitmask Values:**
+    *   Bit 0 (1): Up
+    *   Bit 1 (2): Down
+    *   Bit 2 (4): Left
+    *   Bit 3 (8): Right
+    *   Bit 4 (16): Fire Button
+
+**Example:**
+```basic
+' Check Port 2
+DIM j AS BYTE
+j = JOY(2)
+IF (j AND 1) THEN PRINT "Up"
+IF (j AND 16) THEN PRINT "Fire"
+```
+
+---
+
+### **LOAD**
+
+Loads a binary file into memory.
+
+*   **Syntax:** `LOAD <filename>, <device> [, <address>]`
+
+**Details:**
+*   If `<address>` is omitted, it uses the 2-byte header from the file (standard C64 PRG format).
+*   Use `ON ERROR GOTO` to trap load failures.
+
+---
+
+### **MEMCPY / MEMSHIFT / MEMSET**
+
+High-speed memory operations.
+
+*   **MEMSET:** `MEMSET <addr>, <length>, <byte_val>`
+    *   Fills a block of memory with a specific byte value. Efficient for clearing screen/color RAM.
+*   **MEMCPY:** `MEMCPY <src>, <dst>, <length>`
+    *   Copies memory. Safe if non-overlapping or if destination is *lower* than source (copying down).
+*   **MEMSHIFT:** `MEMSHIFT <src>, <dst>, <length>`
+    *   Copies memory. Safe if destination is *higher* than source (copying up).
+
+---
+
+### **OPEN**
+
+Opens a logical file channel.
+
+*   **Syntax:** `OPEN <logical_no>, <device>, <sec_addr>, <filename>`
+
+**Example:**
+```basic
+OPEN 2, 8, 2, "mydata,s,w" ' Open sequential file for write on disk 8
+```
+
+---
+
+### **OPTION**
+
+Sets compiler options. Must be placed at the top of the code.
+
+*   **Syntax:** `OPTION <name> [= <value>]`
+
+**Common Options:**
+*   `TARGET = "c64"` (Recommended to ensure C64 memory layout).
+*   `NOBASICLOADER`: Creates a bare binary without the BASIC startup stub (`10 SYS...`). Useful for cartridges.
+*   `STARTADDRESS = $xxxx`: Sets code origin.
+*   `INLINEDATA`: Allows `DATA` statements to be compiled in program flow rather than a separate segment.
+*   `FASTINTERRUPT`: Optimizes ISR overhead (unsafe if ISR uses virtual registers).
+
+---
+
+### **PRINT#**
+
+Writes text data to a file.
+
+*   **Syntax:** `PRINT #<file_no>, <expr> [, or ;] ...`
+
+**Details:**
+*   Works exactly like `PRINT` but directs output to a file channel.
+*   Use `,` for tabs, `;` to concatenate.
+*   Compatible with `INPUT#`.
+
+---
+
+### **READ# / WRITE#**
+
+Binary file I/O.
+
+*   **WRITE#:** `WRITE #<file_no>, <expr> ...`
+    *   Writes raw binary representation of variables. No separators.
+*   **READ#:** `READ #<file_no>, <var> ...`
+    *   Reads raw binary data back into variables.
+
+**Corner Case:**
+*   You must read back the exact same types in the exact same order they were written, or data will be garbage.
+
+**Example:**
+```basic
+DIM x AS INT, y AS INT
+x = 1000 : y = 2000
+OPEN 1, 8, 2, "bindata,s,w"
+WRITE #1, x, y
+CLOSE 1
+```
+
+---
+
+### **RND / RNDB / RNDI / RNDW / RNDL**
+
+Generates pseudo-random numbers.
+
+*   `RND()`: Returns `FLOAT` (0.0 to 1.0).
+*   `RNDB()`: Returns `BYTE` (0 to 255).
+*   `RNDI()`: Returns `INT` (-32768 to 32767).
+*   `RNDW()`: Returns `WORD` (0 to 65535).
+*   `RNDL()`: Returns `LONG`.
+
+**Note:** Use `RANDOMIZE <seed>` to initialize the sequence (e.g., `RANDOMIZE TI()`).
+
+---
+
+### **SCAN**
+
+Returns the current raster line being drawn by the VIC-II.
+
+*   **Syntax:** `SCAN()`
+*   **Returns:** `WORD` (0 to 311 for PAL, 0 to 262 for NTSC).
+
+**Use:**
+Essential for timing visual effects to avoid tearing, or for light-pen logic.
+
+**Example:**
+```basic
+' Wait for raster line 250 (bottom of screen)
+DO : LOOP UNTIL SCAN() >= 250
+```
+
+---
+
+### **SCREEN**
+
+Switches the logical screen memory location (Video Matrix Base).
+
+*   **Syntax:** `SCREEN <0-15>`
+
+**Details:**
+*   Sets video matrix to `<value> * $400` relative to the current VIC bank.
+*   **Performance Warning:** This command is slow because it updates KERNAL tables (like where `PRINT` puts text). For fast double-buffering in games (flipping between two screens), use direct `POKE`s to VIC registers instead ($D018).
+
+---
+
+### **SELECT CASE**
+
+Multi-branch conditional structure.
+
+*   **Syntax:**
+    ```basic
+    SELECT CASE <expr>
+      CASE <val1>, <val2>
+        <stmts>
+      CASE <start> TO <end>
+        <stmts>
+      CASE IS <operator> <val>
+        <stmts>
+      CASE ELSE
+        <stmts>
+    END SELECT
+    ```
+
+**Example:**
+```basic
+SELECT CASE score
+  CASE 0 TO 99: PRINT "Beginner"
+  CASE 100 TO 999: PRINT "Intermediate"
+  CASE IS >= 1000: PRINT "Expert"
+END SELECT
+```
+
+---
+
+### **SHL / SHR**
+
+Bitwise Shift Left and Right.
+
+*   **Syntax:** `SHL(<val>, <bits>)`, `SHR(<val>, <bits>)`
+
+**Details:**
+*   Equivalent to multiplying (`SHL`) or dividing (`SHR`) by powers of 2.
+*   **SHR** performs a *signed* shift if the type is `INT` or `LONG` (preserves the sign bit), and logical shift for `BYTE`/`WORD`.
+
+---
+
+### **SPRITE**
+
+Configures VIC-II sprite properties.
+
+*   **Syntax:** `SPRITE <id> <subcmd> ...`
+
+**Details:**
+*   `<id>`: Sprite number 0-7.
+
+**Subcommands:**
+*   `ON`, `OFF`: Enable/Disable.
+*   `AT <x>, <y>`: Sets position. X range 0-511, Y range 0-255.
+*   `COLOR <val>`: Sets sprite color (0-15).
+*   `SHAPE <pointer>`: Sets the data source.
+    *   **Calculation:** The pointer value is `(Address - VIC_Bank_Address) / 64`. E.g., if Bank 0 starts at $0000 and sprite data is at $2000, shape is 128.
+*   `HIRES`: Sets standard high-resolution mode (2 colors).
+*   `MULTI`: Sets multicolor mode (4 colors).
+*   `ON BACKGROUND`: Priority low (behind text/background).
+*   `UNDER BACKGROUND`: Priority high (in front of text/background).
+
+**Example:**
+```basic
+' Enable Sprite 0, set pointer 128 ($2000), move to 100,50, set Red
+SPRITE 0 ON SHAPE 128 AT 100, 50 COLOR 2
+```
+
+---
+
+### **SYS**
+
+Calls a machine language subroutine.
+
+*   **Syntax:** `SYS <address> [FAST]`
+
+**Details:**
+*   **Standard:** Loads CPU registers (A, X, Y, Status) from memory locations `$030C`-$030F` before jumping. Saves them back to those addresses on return.
+*   **FAST:** Jumps directly to address without setting up registers. Much faster; use this if the routine doesn't need specific register inputs.
+
+---
+
+### **TEXTAT**
+
+Writes a string directly to screen memory at specific coordinates.
+
+*   **Syntax:** `TEXTAT <x>, <y>, <text> [, <color>]`
+
+**Difference from PRINT:**
+*   Does not move the cursor.
+*   Writes raw screen codes (0-255), not PETSCII. E.g., 'A' is 1, not 65.
+*   Control characters (like `{CLR}`) are printed as glyphs, not executed.
+*   No bounds checking (unsafe).
+
+**Example:**
+```basic
+' Write "hello" at col 0, row 0 in White (1)
+TEXTAT 0, 0, "hello", 1
+```
+
+---
+
+### **TYPE**
+
+Defines a User Defined Type (Struct/Class).
+
+*   **Syntax:**
+    ```basic
+    TYPE <name>
+      <field> AS <type>
+      SUB <method> ...
+    END TYPE
+    ```
+
+**Usage:**
+*   Fields are accessed via dot notation: `myvar.field`.
+*   Methods (SUBs inside types) can access the instance using `THIS`.
+
+**Example:**
+```basic
+TYPE Enemy
+  x AS INT
+  y AS INT
+  hp AS BYTE
+END TYPE
+
+DIM e AS Enemy
+e.x = 100 : e.hp = 50
+```
+
+---
+
+### **VMODE**
+
+Sets the VIC-II video mode.
+
+*   **Syntax:**
+    `VMODE [TEXT|BITMAP|EXT] [HIRES|MULTI] [ROWS 24|25] [COLS 38|40]`
+
+**Options:**
+*   `TEXT`: Standard character mode.
+*   `BITMAP`: 320x200 graphics mode.
+*   `EXT`: Extended background color mode (ECM).
+*   `HIRES`: Standard 2-color mode.
+*   `MULTI`: Multicolor 4-color mode.
+*   `ROWS 24`: Opens top/bottom borders (RSEL=0).
+*   `COLS 38`: Opens side borders (CSEL=0).
+
+**Example:**
+```basic
+' Switch to Multicolor Bitmap mode
+VMODE BITMAP MULTI
+```
+
+---
+
+### **VOICE**
+
+Abstracted command to control the SID sound chip.
+
+*   **Syntax:** `VOICE <id> <cmd> ...`
+
+**Details:**
+*   `<id>`: Voice 1, 2, or 3.
+
+**Subcommands:**
+*   `ON`, `OFF`: Gates the voice (starts/stops Attack/Release cycle).
+*   `WAVE <SAW|TRI|PULSE|NOISE>`: Sets the waveform.
+*   `TONE <freq>`: Sets frequency (0-65535).
+*   `PULSE <width>`: Sets pulse width (0-4095) for PULSE wave.
+*   `ADSR <a,d,s,r>`: Sets envelope (Attack, Decay, Sustain, Release) 0-15.
+*   `FILTER ON|OFF`: Routes this voice through the filter.
+
+**Example:**
+```basic
+' Setup SID Voice 1 as a sawtooth bass
+VOICE 1 WAVE SAW TONE 4000 ADSR 0,9,5,0 ON
+```
+
+---
+
+### **WAIT**
+
+Pauses execution until a memory location changes.
+
+*   **Syntax:** `WAIT <address>, <mask> [, <xor_val>]`
+
+**Logic:**
+1.  Read byte at `<address>`.
+2.  XOR with `<xor_val>` (default 0).
+3.  AND with `<mask>`.
+4.  If result is 0, repeat. If result != 0, continue.
+
+**Example:**
+```basic
+' Wait until the raster line (lowest bit of $D012) is high
+WAIT $D012, 128
+```
+
+====== XC=BASIC 3.0 programming reference END ======

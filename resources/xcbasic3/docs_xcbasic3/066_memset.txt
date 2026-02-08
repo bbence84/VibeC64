@@ -1,0 +1,21 @@
+====== MEMSET ======
+
+[pet] [vic20] [c64] [c16] [cplus4] [c128] [x16] [m65]
+===== Syntax: =====
+
+  MEMSET <source_address>, <length>, <fill_value>
+
+The ''MEMSET'' command calls a built-in routine that sets //length// number of bytes in memory to //fill_value// starting from //source_address//.
+
+==== Example ====
+
+  REM -- clear the screen
+  MEMSET 1024, 1000, 32
+
+<adm note>
+''MEMSET'' uses fast Direct Memory Access (DMA) on the [m65].
+</adm>
+===== See also =====
+
+  * [[MEMCPY]]
+  * [[MEMSHIFT]]

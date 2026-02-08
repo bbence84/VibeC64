@@ -1,0 +1,25 @@
+====== SQR ======
+
+The ''SQR()'' function returns the square root of a number.
+
+===== Function header =====
+
+  DECLARE FUNCTION SQR AS BYTE (num AS INT) SHARED STATIC INLINE
+  DECLARE FUNCTION SQR AS BYTE (num AS WORD) OVERLOAD SHARED STATIC INLINE
+  DECLARE FUNCTION SQR AS WORD (num AS LONG) OVERLOAD SHARED STATIC INLINE
+  DECLARE FUNCTION SQR AS FLOAT (num AS FLOAT) OVERLOAD SHARED STATIC INLINE
+
+If the argument is a FLOAT, the return value will also be a FLOAT, as accurate as possible. However if the argument is an INT, WORD or LONG, the return value will be a BYTE or WORD, without any fractional part. 
+
+===== Examples =====
+
+  PRINT SQR(2) : REM outputs 1
+  PRINT SQR(2.0) : REM outputs 1.41421
+
+In the first line, the argument is 2. Since 2 doesn't have a fractional part, the compiler will treat it as a BYTE. When calling ''SQR()'', the compiler will find the function from the above list that is the most suitable for the argument, that is the one with the INT argument. Calling that function will result in a BYTE, an 8-bit number with no fractional part.
+
+In the second line we use the literal 2.0 that the compiler recognizes as FLOAT and therefore the best match is the function accepting a FLOAT argument and returning a FLOAT.
+
+===== See also =====
+
+  * [[POW]]

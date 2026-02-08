@@ -1,0 +1,26 @@
+====== SPRITEHIT ======
+
+[c64] [c128] [m65]
+
+Checks for sprite to sprite collision.
+
+===== Function declaration =====
+
+  DECLARE FUNCTION _
+  SPRITEHIT AS BYTE (sprno AS BYTE) SHARED STATIC INLINE
+
+If the sprite specified by <spro> has previously come in contact with any other sprite(s), the function will return 255 (true), 0 (false) otherwise.
+
+<adm note>
+Sprite number must be a number between 0 and 7.
+</adm>
+===== Example =====
+
+  SPRITE CLEAR HIT
+  DO
+  ' <game looop...>
+  LOOP UNTIL SPRITEHIT(0)
+  PRINT "booom!!!"
+===== See also =====
+
+  * [[sprites]]

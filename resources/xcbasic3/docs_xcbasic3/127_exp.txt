@@ -1,0 +1,20 @@
+====== EXP ======
+
+''EXP()'' is a mathematical function that evaluates the inverse natural logarithm of the argument, that is, the constant //e// (approx. 2.71828) raised to the power of the number given.
+
+===== Function header =====
+
+  DECLARE FUNCTION EXP AS FLOAT (num AS FLOAT) SHARED STATIC INLINE
+
+===== Examples =====
+
+  PRINT EXP(0.0) : REM outputs 1
+  PRINT EXP(1.0) : REM outputs 2.71828
+  PRINT EXP(2.0) : REM outputs 7.38906
+
+===== See also =====
+
+  * [[LOG]]
+  * [[POW]]
+
+

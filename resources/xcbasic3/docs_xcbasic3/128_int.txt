@@ -1,0 +1,18 @@
+====== FLOOR ======
+
+The ''FLOOR()'' function returns the integer part of a floating point value, also as a floating point number.
+
+<adm note>
+The function is equivalent to CBM BASIC's ''INT()'' function. However, it has a different name in XC=BASIC due to conflict with the ''INT'' keyword.
+</adm>
+===== Function header =====
+
+  DECLARE FUNCTION FLOOR AS FLOAT (num AS FLOAT) SHARED STATIC INLINE
+
+===== Example =====
+
+  PRINT FLOOR(3.14159) : REM outputs 3
+
+<adm note>
+To convert a floating point number to integer type, see [[v3:cint|]].
+</adm>

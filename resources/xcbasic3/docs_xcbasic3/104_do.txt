@@ -1,0 +1,23 @@
+====== DO ======
+
+[pet] [vic20] [c64] [c16] [cplus4] [c128] [x16] [m65]
+
+The ''DO ... LOOP'' block defines a pre-test or post-test loop.
+
+===== Pre-test syntax =====
+
+  DO WHILE|UNTIL <condition>
+    <statements>
+  LOOP
+
+===== Post-test syntax =====
+
+  DO
+    <statements>
+  LOOP WHILE|UNTIL <condition>
+
+The former is used to test the condition before entering the loop body and the latter is used to test the condition after each iteration. This effectively means that post-test loop will be executed at least once, whereas in a pre-test loop the condition may fail the very first time and therefore it may happen that the statements in the loop will not be executed at all.
+
+In both forms, you can either use the ''WHILE'' or ''UNTIL'' keywords. ''WHILE'' means that the loop is entered if the condition evaluates to true, ''UNTIL'' means that the loop is exited if the condition evaluates to true.
+
+You can use the ''EXIT DO'' command to prematurely exit a ''DO … LOOP'' block, or ''CONTINUE DO'' to skip rest of the block and go to the next iteration.

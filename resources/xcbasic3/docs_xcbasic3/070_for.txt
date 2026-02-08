@@ -1,0 +1,97 @@
+====== FOR ======
+
+[pet] [vic20] [c64] [c16] [cplus4] [c128] [x16] [m65]
+===== Syntax =====
+
+  FOR <varname> [AS <type>] = <start_value> TO <end_value> [STEP <step_value>]
+    <statements>
+  NEXT [<varname>]
+
+The ''FOR ... NEXT'' loop initializes a counter variable and executes the statements in the block until the counter variable equals the value in the ''TO'' clause. After each iteration, the counter variable is incremented by the step value or 1 in case the step value was not specified. For example:
+
+  DIM i AS BYTE
+  FOR i = 1 TO 30 STEP 3
+    PRINT i
+  NEXT i
+
+As you can see above, the counter variable must be predefined. If the variable is not predefined, you can use the ''AS'' keyword to specify the type and this way the compiler will automatically define the variable before starting the loop. The following code is identical to the one above:
+
+  FOR i AS BYTE = 1 TO 30 STEP 3
+    PRINT i
+  NEXT i
+
+<adm warning>
+The counter variable, the start value, the end value and the step value must all be of the same numeric type and this type is concluded from the counter variable. All the other expressions will be converted to this type if possible, otherwise a compile-time error will be thrown.
+</adm>
+
+<adm note>
+The variable name can be omitted in the ''NEXT'' statement.
+</adm>
+
+===== Countdown of unsigned types  =====
+
+For performance and overflow-safety reasons, it is not possible to go downwards in a loop where the index variable is of an unsigned type (BYTE or WORD). You should rather use a [[v3:do|]] loop for this purpose:
+
+  ' This loop will never run because -1 is converted to 255
+  FOR b AS BYTE = 5 TO 1 STEP -1
+    PRINT b
+  NEXT b
+  
+  ' Use this instead
+  DIM i AS BYTE
+  i = 5
+  DO WHILE i >= 1
+    PRINT i
+    i = i - 1
+  LOOP
+  
+  ' Or simply use a signed type
+  FOR x AS INT = 5 TO 1 STEP -1
+    PRINT x
+  NEXT x
+===== Continuing the loop =====
+
+You can use the ''CONTINUE FOR'' command to skip the rest of the statements in the ''FOR ... NEXT'' block and go to the next iteration, for example:
+
+  REM -- print numbers from 1 to 10, except 5 and 7
+  FOR num AS BYTE = 1 TO 10
+    IF num = 5 OR num = 7 THEN CONTINUE FOR
+    PRINT num
+  NEXT
+
+===== Early exiting the loop =====
+
+Finally, you can use the ''EXIT FOR'' statement to early exit a ''FOR ... NEXT'' loop.
+
+  DIM a$ AS STRING * 1
+  FOR i AS BYTE = 1 TO 10
+    PRINT "iteration #"; i : INPUT "do you want to continue? (y/n)"; a$
+    IF a$ = "n" THEN EXIT FOR
+    PRINT i
+  NEXT i
+  
+===== The counter is always STATIC =====
+
+Despite variables in [[v3:subroutines|]] or [[v3:functions|]] can be defined either [[v3:static|]] or dynamic, the counter of a ''FOR ... NEXT'' loop must always be STATIC. For this reason,
+
+  - If you try to use a previously defined dynamic variable as counter, compilation will fail
+  - If you let the compiler automatically define the variable (using the ''AS'' keyword), the variable will be defined as STATIC.
+
+  SUB mydynamicsub ()
+    DIM i AS BYTE
+    FOR i = 0 TO 10 : PRINT i : NEXT ' Error, i can't be dynamic
+  END SUB
+
+  SUB mystaticsub () STATIC
+    DIM i AS BYTE
+    FOR i = 0 TO 10 : PRINT i : NEXT ' Works because i is now STATIC
+  END SUB
+
+  SUB mydynamicsub ()
+    STATIC i AS BYTE
+    FOR i = 0 TO 10 : PRINT i : NEXT ' This works, too
+  END SUB
+
+  SUB mydynamicsub ()
+    FOR i AS BYTE = 0 TO 10 : PRINT i : NEXT ' Also works, i will be defined STATIC
+  END SUB

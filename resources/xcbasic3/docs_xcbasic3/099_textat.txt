@@ -1,0 +1,38 @@
+====== TEXTAT ======
+
+[pet] [vic20] [c64] [c16] [cplus4] [c128] [x16] [m65]
+
+The ''TEXTAT'' command outputs a string at the given X and Y position of the currently selected screen without affecting the cursor position.
+
+=====Syntax=====
+
+  TEXTAT <x_pos>, <y_pos>, <text> [, <color>]
+
+  * ''<x_pos>'' must be between 0 and the screen width minus one
+  * ''<y_pos>'' must be between 0 and the screen height minus one
+  * ''<text>'' can be either a string or a numeric expression
+  * ''<color>'' is optional, it must be between 0 and 15 if provided. If not provided, the character color will be whatever value happens to be in the corresponding Color RAM location.
+
+<adm warning>
+The runtime library will not check if the X and Y values are within the screen boundaries. Providing wrong values will lead to writing to memory locations outside the screen memory, thus potentially damaging the program or data. Use it with care.
+</adm>
+
+<adm note>
+Color values between 8 and 15 will set the character to multicolor mode on the Commodore VIC-20.
+</adm>
+
+<adm warning>
+''TEXTAT'' writes screen codes directly to screen memory, rather than calling the KERNAL character output routine. For this reason PETSCII control caracters (color, cursor movement, etc.) will have no effect on the printed text.
+</adm>
+=====Examples=====
+
+  REM output "welcome" near the center of the screen
+  TEXTAT 16, 12, "welcome"
+  REM output "hello" in the top left corner of the screen, in yellow
+  TEXTAT 0, 0, "hello", 7
+
+
+=====See Also=====
+
+  * [[v3:SCREEN]]
+  * [[v3:CHARAT]]

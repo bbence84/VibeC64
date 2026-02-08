@@ -1,0 +1,17 @@
+====== DECLARE ======
+
+[pet] [vic20] [c64] [c16] [cplus4] [c128] [x16] [m65]
+
+The declare keyword forward-declares a subroutine or function.
+
+===== Syntax =====
+
+  DECLARE SUB <name> ([arg1 AS <type> [, arg2 AS <type>, ... ]]) [OVERRIDE] [STATIC] [SHARED]
+  DECLARE FUNCTION <name> AS <type> ([arg1 AS <type> [, arg2 AS <type>, ... ]]) [OVERRIDE] [STATIC] [SHARED]
+
+Read more about forward declaration [[subroutines#forward_declaration|here]].
+
+===== See also =====
+
+  * [[FUNCTION]]
+  * [[SUB]]

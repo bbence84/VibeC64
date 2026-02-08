@@ -1,0 +1,28 @@
+======LET======
+
+[pet] [vic20] [c64] [c16] [cplus4] [c128] [x16] [m65]
+=====Syntax=====
+  [LET] <variable> = <expression>
+
+The ''LET'' command assigns the value of an expression to a variable.
+
+===== Examples =====
+  ' DIM some variables and assign values to them
+  DIM x AS BYTE
+  DIM y(10) AS INT
+  LET x = 5
+  LET y(2) = x * 2
+
+In the above example, variable ''x'' is defined as a ''BYTE'' and ''y'' is defined as an ''INT'' array with ''11'' dimensional elements. Variable ''x'' is then assigned the value of ''5'' and variable ''y'''s second array element is assigned the value of the expression ''x * 2'', which evaluates to ''10'' in this example.
+
+<adm note>
+''LET'' is an optional keyword and may be omitted when assigning values or expressions to a variable.
+</adm>
+
+
+
+=====See Also=====
+  * [[v3:DIM]]
+  * [[v3:operators]]
+  * [[v3:variables]]
+  * [[v3:syntax]]

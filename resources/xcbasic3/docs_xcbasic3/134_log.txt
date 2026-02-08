@@ -1,0 +1,20 @@
+====== LOG ======
+
+The ''LOG()'' function returns the natural logarithm (log to the base of //e//) of the argument.
+
+===== Function header =====
+
+  DECLARE FUNCTION LOG AS FLOAT (num AS FLOAT) SHARED STATIC INLINE
+
+===== Examples =====
+
+  PRINT LOG(1.0) : REM outputs a number very close to zero
+  PRINT LOG(10.0) : REM outputs 2.30259
+  PRINT LOG(100.0) / LOG(10.0) : REM outputs 2
+
+===== See also =====
+
+  * [[EXP]]
+  * [[POW]]
+
+

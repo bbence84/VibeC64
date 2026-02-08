@@ -1,0 +1,11 @@
+====== XOR ======
+
+[pet] [vic20] [c64] [c16] [cplus4] [c128] [x16] [m65]
+
+The ''XOR'' operator performs a bitwise exclusive-or operation.
+
+===== Syntax =====
+
+  <operand> XOR <operand>
+
+Both operands can be any type of numeric expression except FLOAT.

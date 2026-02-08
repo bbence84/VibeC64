@@ -1,0 +1,14 @@
+====== VAL ======
+
+The ''VAL()'' function converts a string to a floating point number.
+
+===== Function header =====
+
+  DECLARE FUNCTION VAL AS FLOAT (instr$ AS STRING) SHARED STATIC INLINE
+
+===== Examples =====
+
+  DIM pi AS FLOAT
+  pi = VAL("3.14159")
+
+

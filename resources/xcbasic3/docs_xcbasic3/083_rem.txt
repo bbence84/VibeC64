@@ -1,0 +1,10 @@
+====== REM ======
+
+[pet] [vic20] [c64] [c16] [cplus4] [c128] [x16] [m65]
+===== Syntax =====
+
+  REM <comments>
+or
+  ' <comments>
+  
+The ''REM'' keyword marks a comment until the end of that line. The compiler will ignore it.

@@ -1,0 +1,18 @@
+====== LEN ======
+
+The ''LEN()'' function counts the number of characters in a string.
+
+===== Function header =====
+
+  DECLARE FUNCTION LEN AS BYTE (arg$ AS STRING) SHARED STATIC INLINE
+
+If the argument is a variable, the function will return the actual length of the string, rather than the length to which the variable was defined.
+
+===== Examples =====
+
+  PRINT LEN("") : REM outputs 0
+  PRINT LEN("hello") : REM outputs 5
+  DIM a$ AS STRING * 16
+  a$ = "world"
+  PRINT LEN(a$) : REM outputs 5 (the actual length of the string)
+

@@ -1,0 +1,23 @@
+====== SAVE ======
+
+[vic20] [c16] [cplus4] [c64] [c128] [m65]
+
+The ''SAVE'' command saves a memory area into a file on the given device. The first two bytes in the file will contain the start address.
+
+===== Syntax =====
+
+  SAVE <filename>, <device_no>, <start_address>, <end_address>
+
+Prepend the file name with ''@0'' to overwrite an existing file on disk.
+
+<adm warning>
+File I/O commands are not implemented for the Commodore PET.
+</adm>
+===== Example =====
+
+  save "@0:existingfile", 8, 49152, 49408
+
+===== See also =====
+
+  * [[v3:fileio|]]
+  * [[LOAD]]

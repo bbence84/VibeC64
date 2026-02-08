@@ -1,0 +1,31 @@
+====== GOSUB ======
+
+[pet] [vic20] [c64] [c16] [cplus4] [c128] [x16] [m65]
+===== Syntax =====
+
+  GOSUB <label>
+
+The ''GOSUB'' command calls a subroutine marked by a label. ''RETURN'' will pass control back to the caller. 
+
+<adm note>
+Unlike [[subroutines]], labelled code points do not start a new local scope.
+</adm>
+===== Example =====
+
+  REM ** subroutines **
+  GOSUB first_routine
+  END
+  	
+  first_routine:
+    PRINT "hello world"
+    GOSUB second_routine
+    RETURN
+  		
+  second_routine:
+    PRINT "and hello again"
+    RETURN
+
+<adm warning>
+Make sure you use the ''[[END|END]]'' command before your routines if you don't want them to be executed in the normal program flow (like in the example above).
+</adm>
+

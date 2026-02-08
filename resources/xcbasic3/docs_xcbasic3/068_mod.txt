@@ -1,0 +1,39 @@
+====== MOD ======
+
+[pet] [vic20] [c64] [c16] [cplus4] [c128] [x16] [m65]
+
+The ''MOD'' ("modulo") operator solves the remainder of a division, after one number is divided by another.
+===== Syntax =====
+
+  <dividend> MOD <divisor>
+
+===== Examples =====
+
+  PRINT 5 MOD 2 : REM outputs 1
+
+The above expression evaluates to 1, because 5 divided by 2 has a quotient of 2 and a remainder of 1.
+
+  CONST PI = 3.14159
+  PRINT (2.5 * PI) MOD PI : REM outputs a number equal to PI/2
+
+The following program checks whether a year is a leap year:
+
+  DIM in$ AS STRING * 4
+  DIM year AS WORD
+  DIM isleap AS BYTE
+  CONST TRUE = 255
+  CONST FALSE = 0
+  INPUT "enter year: "; in$
+  year = CWORD(VAL(in$))
+  IF year MOD 4 = 0 THEN
+    IF year MOD 100 = 0 THEN
+      isleap = (year MOD 400 = 0)
+    ELSE
+      isleap = TRUE
+    END IF
+  ELSE
+    isleap = FALSE
+  END IF
+  PRINT year; " is ";
+  IF NOT isleap THEN PRINT "not ";
+  PRINT "a leap year."

@@ -1,0 +1,34 @@
+====== READ# ======
+
+[vic20] [c16] [cplus4] [c64] [c128] [m65]
+
+The ''READ#'' command is used for restoring the contents of a variable from a file. The file must be opened first using [[OPEN]].
+
+===== Syntax =====
+
+  READ #<logical_file_no>, <variable> [, <variable> ... ]
+
+The ''READ#'' command is similar to [[INPUT_hash]] in that both commands read sequential data from a file, however while ''INPUT#'' accepts PETSCII-encoded (textual) data, ''READ#'' accepts binary data. To put it simple:
+
+  * ''INPUT#'' can restore data stored using [[PRINT_hash]]
+  * ''READ#'' can restore data stored using [[WRITE]]
+
+<adm note>
+''READ'' accepts any number of variables of any type, even [[udt]].
+</adm>
+
+For an in-depth explanation of file input-output operations with examples, please read [[fileio]].
+
+<adm warning>
+File I/O commands are not implemented for the Commodore PET.
+</adm>
+
+===== See also =====
+
+  * [[OPEN]]
+  * [[CLOSE]]
+  * [[GET_hash]]
+  * [[PRINT_hash]]
+  * [[INPUT_hash]]
+  * [[WRITE]]
+  * [[ST]]

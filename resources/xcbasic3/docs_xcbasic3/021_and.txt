@@ -1,0 +1,20 @@
+====== AND ======
+
+[pet] [vic20] [c64] [c16] [cplus4] [c128] [x16] [m65]
+
+The ''AND'' operator performs a bitwise AND operation.
+
+===== Syntax =====
+
+  <operand> AND <operand>
+
+Both operands can be any type of numeric expression, except FLOAT.
+
+==== Examples ====
+
+  PRINT 1 AND 0 : REM outputs 0
+  IF x >= 0 AND x <= 10 THEN PRINT "x is between 0 and 10"
+===== See also =====
+
+  * [[OR]]
+  * [[XOR]]

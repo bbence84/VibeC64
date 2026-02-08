@@ -1,0 +1,3 @@
+====== ELSE ======
+
+''ELSE'' marks the fail branch of an ''IF'' block. See [[IF]].

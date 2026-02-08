@@ -1,0 +1,27 @@
+====== SPRITEBGHIT ======
+
+[c64] [c128] [m65]
+
+Checks for sprite to background collision.
+
+===== Function declaration =====
+
+  DECLARE FUNCTION _
+  SPRITEBGHIT AS BYTE (sprno AS BYTE) SHARED STATIC INLINE
+
+If the sprite specified by <spro> has previously come in contact with the background graphics, the function will return 255 (true), 0 (false) otherwise.
+
+<adm note>
+Sprite number must be a number between 0 and 7.
+</adm>
+===== Example =====
+
+  SPRITE CLEAR HIT
+  DO
+  ' <game looop...>
+  LOOP UNTIL SPRITEBGHIT(0)
+  PRINT "the airplane has crashed!"
+
+===== See also =====
+
+  * [[SPRITE]]

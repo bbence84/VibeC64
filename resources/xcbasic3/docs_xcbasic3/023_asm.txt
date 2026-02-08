@@ -1,0 +1,99 @@
+======ASM======
+
+[pet] [vic20] [c64] [c16] [cplus4] [c128] [x16] [m65]
+=====Syntax=====
+  ASM 
+    <assembly code>
+    <assembly code>
+  END ASM
+
+The ''ASM'' directive injects bare 6502 assembly code into the compiled **XC=BASIC** code without any modification. As **XC=BASIC** itself produces [[http://dasm-dillon.sourceforge.net/|dasm]] code, the injected assembly code must also be in dasm format and syntax.
+
+===== Example =====
+  REM -- set border to black using XC=BASIC code
+  POKE $d020, 0
+  REM -- set background to black using inline assembly
+  ASM
+   lda #$00
+   sta $d021
+  END ASM
+  REM -- the XC=BASIC program continues on from here
+  PRINT "done"
+  END
+
+The above example illustrates how to use ''ASM'' to inject inline assembly code into the **XC=BASIC** program. The compiler will send the code between the ''ASM ... END ASM'' commands straight to dasm for assembly immediately following the POKE command. Newlines are used in this example to improve the readability of 6502 assembly code that spans beyond one line. Note there are no quotation marks or other encapsulations around the assembly code as was previously required in **XC=BASIC** v2.
+
+Note the spaces before the opcodes on each line of dasm assembly code. Leading spaces are required by dasm for any line of assembly that is not a valid label in dasm.
+
+<adm warning>
+Each line in dasm assembly code must start with a label or at least one space.
+</adm>
+
+<adm note>The **XC=BASIC** compiler cannot validate the in-line assembly code. It will be copied verbatim into the XC=BASIC assembly before being compiled by dasm, so you must take special care with the ''ASM'' directive. Dasm will report any errors. Please consult the dasm docs carefully for syntax and formatting.
+</adm>
+
+
+
+===== Referencing BASIC Non-String Variables in Assembly Code =====
+
+To use BASIC non-string variables in assembly code, use the syntax ''{variable_name}''. For example:
+
+  a = 2 : REM global variable
+  b = 7
+  SUB test () STATIC
+    DIM a AS BYTE : REM local variable
+    a = 5
+    ASM
+      lda #$06
+      sta {a} ; {a} is resolved to the local "a"
+      sta {b}
+    END ASM
+    PRINT a
+  END SUB
+  
+  CALL test ()
+  PRINT a
+  PRINT b
+
+<adm warning>
+Only STATIC variables can be referenced using the curly braces syntax.
+</adm>
+
+===== Referencing Strings in Assembly Code =====
+Passing an **XC=BASIC** string by reference will not always produce expected results, because **XC=BASIC** strings in memory are preceded by a single byte string length and are not zero-terminated. Therefore, strings for operations like KERNAL calls (SETNAM, for example) must be be converted first. There are a couple of techniques you can use to accomplish this:
+  * Place the string into unused memory and terminate it with a zero byte, then reference that location in the assembly code
+  * Create a byte array with stringlen + 1 elements, convert the string to a KERNAL-friendly format, then pass the array by reference in the assembly code
+
+An example of the byte array technique:
+
+  ' create a byte array, fill it with the string "file," and zero-terminate it
+  DIM fname(5) AS BYTE
+  fname(0) = ASC("f")
+  fname(1) = ASC("i")
+  fname(2) = ASC("l")
+  fname(3) = ASC("e")
+  fname(4) = 0
+  
+  ' set KERNAL SETNAM routine to point to fname
+  ASM
+    lda #$01
+    ldx #<{fname}    ; set lo byte to fname lo
+    ldy #>{fname}    ; set hi byte to fname hi 
+    jsr $ffbd    ; SETNAM Kernal routine
+  END ASM
+
+Or, if you have a longer string that you want to pass, consider iterating over the string with ''MID$'' (see the following example) to simplify the conversion of a string into a byte array. Note that **XC=BASIC** will reset the string variable's length to the actual length of the assigned string every time a string is assigned to that variable, so you don't need to worry about calculating the length using some other trick if you've assigned a string shorter than the full dimension of the variable. ''LEN(string)'' will work:
+
+  DIM a(22) AS BYTE
+  DIM x AS BYTE
+  DIM b AS STRING * 20
+  b = "the quick brown fox"
+  
+  ' will result in a byte array of "the quick brown fox"
+  ' and a zero byte in the next array element, ready
+  ' for use by a KERNAL call
+  FOR x = 0 to LEN(b)
+      a(x) = ASC(MID$(b, x, 1))
+  NEXT
+  a(len(b) + 1) = 0
+  

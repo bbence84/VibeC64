@@ -1,0 +1,3 @@
+====== LONG ======
+
+The ''LONG'' keyword can be used in several statements to designate a variable or value as a 24-bit signed binary number. See [[v3:datatypes|]] and [[v3:dim|]] for more information.

@@ -1,0 +1,6 @@
+====== STATIC ======
+
+The ''STATIC'' keyword can be used:
+
+  * For defining a static variable in a dynamic sub or function. See [[DIM]].
+  * For defining a subroutine or function static. See [[SUB]] and [[FUNCTION]].

@@ -1,0 +1,22 @@
+====== CONST ======
+
+[pet] [vic20] [c64] [c16] [cplus4] [c128] [x16] [m65]
+
+The const directive defines a constant. Constants are named values that exist in compile-time only and are replaced with their numeric value in runtime.
+
+===== Syntax =====
+
+  [SHARED] CONST <name> = <value>
+  
+The <value> must be a numeric literal.
+
+Constants themselves do not have a type. The [[v3:datatypes#numeric_literals|type of the numeric literal]] will be used when a constant is used in an expression.
+
+Constants have the same [[v3:variables#variable_scope|visibility options]] as variables.
+
+===== Examples =====
+
+  REM -- Constants can be used to improve the readability of your code
+  CONST BORDER = $d020
+  CONST BLACK = 0
+  POKE BORDER, BLACK

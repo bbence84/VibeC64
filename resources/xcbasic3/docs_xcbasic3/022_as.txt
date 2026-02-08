@@ -1,0 +1,9 @@
+====== AS ======
+
+The ''AS'' keyword is generally used to define the type of a variable or parameter. It may appear as part of the below commands:
+
+  * [[DATA]]
+  * [[DIM]]
+  * [[FOR]]
+  * [[FUNCTION]]
+  * [[SUB]]

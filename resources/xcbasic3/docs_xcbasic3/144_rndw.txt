@@ -1,0 +1,23 @@
+====== RNDW ======
+
+The ''RNDW()'' function returns a pseudo-random 16-bit unsigned number, between 0 and 65,535.
+
+===== Function header =====
+
+  DECLARE FUNCTION RNDW AS WORD () SHARED STATIC INLINE
+
+===== Example =====
+
+  ' Display a sequence of 10 random numbers
+  RANDOMIZE TI()
+  FOR i AS BYTE = 1 TO 10
+    PRINT RNDW()
+  NEXT
+
+===== See also =====
+
+  * [[RANDOMIZE]]
+  * [[RNDB]]
+  * [[RNDI]]
+  * [[RNDL]]
+  * [[v3:rnd|]]

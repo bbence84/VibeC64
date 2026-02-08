@@ -1,0 +1,13 @@
+====== PEEK ======
+
+The ''PEEK()'' function returns the content of the specified memory address. The return value is a number between 0 and 255.
+
+===== Function declaration =====
+
+  DECLARE FUNCTION PEEK AS BYTE (address AS WORD) SHARED STATIC INLINE
+  ' MEGA65 only
+  DECLARE FUNCTION PEEK AS BYTE (address AS LONG) OVERRIDE SHARED STATIC INLINE  
+===== Examples =====
+
+  POKE $c000, 127 : REM write value
+  PRINT PEEK($c000) : REM read value

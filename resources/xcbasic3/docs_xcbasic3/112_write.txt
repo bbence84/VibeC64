@@ -1,0 +1,32 @@
+====== WRITE# ======
+
+[vic20] [c16] [cplus4] [c64] [c128] [m65]
+
+The ''WRITE#'' command is used for saving the contents of a variable to a file. The file must be opened first using [[OPEN]].
+
+  WRITE #<logical_file_no>, <expression> [, <exrpession>, ... ]
+
+The ''WRITE#'' command is similar to [[PRINT_hash]] in that both commands output sequential data to a file. However, while ''PRINT#'' outputs PETSCII-encoded (textual) data, ''WRITE#'' outputs binary data. To illustrate:
+
+  * ''PRINT#'' is used to store data that can be restored using [[INPUT_hash]]
+  * ''WRITE#'' is used to store data that can be restored using [[READ]]
+
+<adm warning>
+The ''WRITE#'' command accepts any number of arguments of any type. As data will be output in a raw binary form, without separators, it is very important to make sure that each datum is in the exact same type and order that will be used when reading.
+</adm>
+
+For an in-depth explanation of file input-output operations with examples, please refer to [[fileio]].
+
+<adm warning>
+File I/O commands are not implemented for the Commodore PET.
+</adm>
+
+===== See also =====
+
+  * [[OPEN]]
+  * [[CLOSE]]
+  * [[GET_hash]]
+  * [[PRINT_hash]]
+  * [[INPUT_hash]]
+  * [[READ]]
+  * [[ST]]

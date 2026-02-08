@@ -1,0 +1,13 @@
+====== GOTO ======
+
+[pet] [vic20] [c64] [c16] [cplus4] [c128] [x16] [m65]
+
+The ''GOTO'' command is used for jumping to a labelled code point.
+
+===== Syntax =====
+
+  GOTO <label>
+
+===== See also =====
+
+  * [[GOSUB]]

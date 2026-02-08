@@ -1,0 +1,12 @@
+====== CLONG ======
+
+The ''CLONG()'' function converts its argument to a signed 24-bit value.
+
+===== Function header =====
+
+  DECLARE FUNCTION CLONG AS LONG (number AS BYTE) SHARED STATIC INLINE
+  DECLARE FUNCTION CLONG AS LONG (number AS INT) OVERLOAD SHARED STATIC INLINE
+  DECLARE FUNCTION CLONG AS LONG (number AS WORD) OVERLOAD SHARED STATIC INLINE
+  DECLARE FUNCTION CLONG AS LONG (number AS FLOAT) OVERLOAD SHARED STATIC INLINE
+
+If the argument is a ''FLOAT'', it will be rounded and then converted to ''LONG''.

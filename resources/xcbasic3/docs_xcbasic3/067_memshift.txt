@@ -1,0 +1,25 @@
+====== MEMSHIFT ======
+
+[pet] [vic20] [c64] [c16] [cplus4] [c128] [x16] [m65]
+===== Syntax =====
+
+  MEMSHIFT <source_address>, <destination_address>, <length>
+  
+The ''MEMSHIFT'' command calls a built-in routine that copies //length// number bytes in memory from //source_address// to //destination_address//.
+
+
+<adm note>
+''MEMSHIFT'' uses fast Direct Memory Access (DMA) on the [m65].
+</adm>
+
+The routine is overlapping-safe **upwards only**. Use it if
+
+  * The source and destination ranges don't overlap, or
+  * The destination range is higher in memory
+
+For copying overlapping areas downwards, see ''[[memcpy|MEMCPY]]''.
+
+===== See also =====
+
+  * [[MEMSET]]
+  * [[MEMCPY]]

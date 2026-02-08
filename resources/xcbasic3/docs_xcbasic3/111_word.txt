@@ -1,0 +1,3 @@
+====== WORD ======
+
+The ''WORD'' keyword can be used in several statements to designate a variable or value as a 16-bit unsigned binary number. See [[v3:datatypes|]] and [[v3:dim|]] for more information.

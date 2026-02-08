@@ -1,0 +1,18 @@
+====== POW ======
+
+The ''POW()'' function computes the power of a number.
+===== Function header =====
+
+  DECLARE FUNCTION POW AS FLOAT (base AS FLOAT, exp AS FLOAT) SHARED STATIC INLINE
+  DECLARE FUNCTION POW AS LONG (base AS INT, exp AS BYTE) OVERLOAD SHARED STATIC INLINE
+
+<adm note>
+The CBM BASIC expression ''base↑exp'' can be translated to **XC=BASIC** as ''POW(base, exp)''.
+</adm>
+===== Example =====
+
+  PRINT POW(2, 10) : REM outputs 1024
+
+===== See also =====
+
+  * [[SQR]]

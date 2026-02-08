@@ -1,0 +1,23 @@
+====== CSRLIN ======
+
+[c64] [vic20] [c16] [cplus4] [c128] [x16] [m65]
+
+The ''CSRLIN()'' function returns the current row position of the cursor.
+
+===== Function header =====
+
+  DECLARE FUNCTION CSRLIN AS BYTE () SHARED STATIC INLINE
+
+===== Example =====
+
+  PRINT "the cursor is currently in row "; CSRLIN()
+
+<adm warning>
+This function does not work on the Commodore PET.
+</adm>
+===== See also =====
+
+  * [[POS]]
+  * [[LOCATE]]
+
+

@@ -1,0 +1,61 @@
+====== DATA ======
+
+[pet] [vic20] [c64] [c16] [cplus4] [c128] [x16] [m65]
+
+The ''DATA'' directive marks an area where numeric or string literal values are stored.
+
+===== Syntax =====
+
+  DATA AS <type> <value> [, <value> ...]
+
+The ''DATA'' statement in XC=BASIC is different from the one in CBM BASIC. In XC=BASIC, there's no ''READ'' command to copy data into variables but ''DATA'' is typically used together with ''DIM'' to statically initialize a variable with values, like in the following example:
+
+  DIM squares(7) AS INT @lab_squares
+  PRINT squares(3) : REM -- outputs 9
+  lab_squares:
+  DATA AS INT 0, 1, 4, 9, 16, 25, 36
+
+The ''DIM'' statement in the first line defines the variable //squares// as an array of seven integers and tells the compiler that the address of the array is where the //lab_squares// label is. Therefore the array is already filled with the values after the ''DATA'' statement without the need of copying using ''READ''.
+
+===== Storing strings =====
+
+When using DATA with strings, you have to denote the maximum string length. This doesn't mean that all strings must be of this length, it only gives a hint to the compiler how to align data in code. If a string is shorter than the denoted length, remaining memory will be padded with zero bytes. If a string is longer, it will be truncated to the maximum length. For example:
+
+  DIM x$(4) AS STRING * 5 @mydat
+  FOR i AS BYTE = 0 TO 3 : PRINT x$(i) : NEXT
+  mydat:
+  DATA AS STRING * 5 "hello", "thisistoolong", "abc", "world"
+
+The above DATA area will be laid out in memory like this:
+
+  ' First byte is string length
+  05 48 45 4C 4C 4F ' "hello"
+  05 54 48 49 53 49 ' truncated to "thisi"
+  03 41 42 43 00 00 ' "abc" + padding using 00 bytes
+  05 57 4F 52 4C 44 ' "world"
+
+===== Inline data injection =====
+
+By default, data are separated from code in XC=BASIC. This means that anything defined in DATA statements will be placed in a separate segment that is located after the code segment, outside of the program flow. This means that you can place a DATA statement anywhere, it won't affect the generated program code. The following example is identical to the one above.
+
+  lab_squares:
+  DATA AS INT 0, 1, 4, 9, 16, 25, 36
+  DIM squares(7) AS INT @lab_squares
+  PRINT squares(3) : REM -- outputs 9
+
+There are situations, however, when you don't want to separate data from code and you need full control over where data is compiled (e. g using the [[v3:origin|]] directive). This is where the  [[OPTION]] INLINEDATA (or, alternatively, the command line option //--inline-data//) comes in handy. Setting it to TRUE will make DATA statements compiled right where they're in the program flow. For example:
+
+  OPTION INLINEDATA
+  GOTO main
+  lab_squares:
+  DATA AS INT 0, 1, 4, 9, 16, 25, 36
+  main:
+  DIM squares(7) AS INT @lab_squares
+  PRINT squares(3) : REM -- outputs 9
+
+If the above example is compiled, data will precede the main program.
+
+<adm warning>
+When data is compiled inline, you have to make sure that DATA statements never get executed as part of the program flow. Note the GOTO command above that skips DATA. If data gets executed by mistake, the program will (most likely) crash.
+</adm>
+

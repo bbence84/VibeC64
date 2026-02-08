@@ -1,0 +1,137 @@
+====== SPRITE ======
+
+[c64] [c128] [x16] [m65]
+
+The ''SPRITE'' command sets various properties of a single sprite, including visibility, shape, color, etc.
+
+===== Syntax =====
+
+  SPRITE <spr_no> <subcommand> <subcommand> ...
+
+Where //<spr_no>// is an expression that evaluates to a number between 0 and 7 and //<subcommand>// is one of:
+
+  * ''ON'' or ''OFF'' [c64] [c128] [x16] [m65]
+  * ''AT <x>, <y>'' [c64] [c128] [x16] [m65]
+  * ''SHAPE <n>'' [c64] [c128] [x16] [m65]
+  * ''COLOR <c>'' [c64] [c128] [x16] [m65]
+  * ''HIRES'' or ''MULTI''  [c64] [c128] [m65]
+  * ''LOWCOL'' or ''HICOL''  [x16]
+  * ''XYSIZE <x>, <y>''  [c64] [c128] [x16] [m65]
+  * ''ON BACKGROUND'' or ''UNDER BACKGROUND'' [c64] [c128] [m65]
+  * ''ZDEPTH <n>'' [x16]
+  * ''XYFLIP <xf>, <yf>'' [x16]
+===== Examples =====
+
+  SPRITE 0 SHAPE 4 ON AT 160, 100 COLOR 1
+  SPRITE 1 OFF
+  ' Notice: the _ character splits long lines
+  SPRITE 2 _
+    SHAPE 3 _
+    ON _
+    AT 50, 50 _
+    MULTI _
+    UNDER BACKGROUND
+
+===== SPRITE ON / OFF =====
+
+Enables or disables sprite visibility, for example:
+
+  SPRITE 0 OFF
+  SPRITE 1 ON
+
+On the [x16], ''ON'' is equivalent to ''ZDEPTH 3'', while ''OFF'' is equivalent to ''ZDEPTH 0''.
+===== SPRITE AT =====
+
+Locates sprite at the given co-ordinates on screen. For example:
+
+  SPRITE 5 AT 100, 140
+
+will position sprite 5 at location (100,140).
+
+===== SPRITE SHAPE =====
+
+Sets the address where the bitmap data of a sprite is stored in memory.
+
+On the [c64] and [c128] this memory address is relative to the currently selected VIC bank and is calculated with the following formula:
+
+  address = VIC bank start + 64 * sprite shape
+  
+For example:
+
+  SPRITE 0 SHAPE 128
+
+will set the address 0 + 128 * 64 = 8192 ($2000) for sprite 0, the default VIC bank address being 0.
+
+On the [x16] this memory address is a VRAM address, calculated with the following formula:
+
+  address = sprite shape * 32
+
+For example:
+
+  SPRITE 0 SHAPE 2048
+
+will set the address 2048 * 32 = 65536 ($10000) for sprite 0, that is, the first byte of the second VRAM bank.
+===== SPRITE COLOR =====
+
+[c64] [c128] Sets the individual sprite color to the desired value.
+
+  CONST RED = 2
+  SPRITE 1 COLOR RED
+
+Note: global colors of multicolor sprites can be set using the [[SPRITE MULTICOLOR]] command.
+
+[x16] Sets the palette offset for the sprite.
+===== SPRITE HIRES / MULTI =====
+
+[c64] [c128] Switches between high-resolution mode and multicolor modes for a single sprite.
+
+  SPRITE 7 MULTI
+  SPRITE 5 HIRES
+
+===== SPRITE LOWCOL / HICOL =====
+
+[x16] Switches between 4 bpp (low color) and 8 bpp (high color) modes for a single sprite.
+
+  SPRITE 7 LOWCOL
+  SPRITE 5 HICOL
+
+===== SPRITE XYSIZE =====
+
+Sets horizontal and vertical size of a sprite. Possible values differ by platform, see the following code snipplets for example:
+
+  ' Commodore 64 and 128
+  SPRITE 0 XYSIZE 0, 0 ' Normal size
+  SPRITE 1 XYSIZE 1, 0 ' Horizontally stretched
+  SPRITE 2 XYSIZE 0, 1 ' Vertically stretched
+  SPRITE 3 XYSIZE 1, 1 ' Stretched in  both directions
+  ' Commander X16
+  SPRITE 0 XYSIZE 0, 0 ' 8x8 pixels
+  SPRITE 1 XYSIZE 1, 0 ' 16x8 pixels
+  SPRITE 2 XYSIZE 0, 1 ' 8x16 pixels
+  SPRITE 3 XYSIZE 1, 1 ' 16x16 pixels
+  ' ...
+  SPRITE 16 XYSIZE 3, 3 ' 64x64 pixels
+===== SPRITE ON/UNDER BACKGROUND =====
+
+[c64] [c128] Sets whether the sprite is displayed before or behind background graphics.
+
+  SPRITE 0 ON BACKGROUND
+  SPRITE 1 UNDER BACKGROUND
+
+===== SPRITE ZDEPTH =====
+
+[x16] Sets where the sprite appears among layers.
+
+  SPRITE 0 ZDEPTH 0 ' Sprite disabled (equivalent to SPRITE 0 OFF)
+  SPRITE 0 ZDEPTH 1 ' Sprite between background and layer 0
+  SPRITE 0 ZDEPTH 2 ' Sprite between layer 0 and layer 1
+  SPRITE 0 ZDEPTH 3 ' Sprite in front of layer 1 (equivalent to SPRITE 0 ON)
+
+===== SPRITE XYFLIP =====
+
+[x16] Flips (mirrors) the sprite horizontally and/or vertically.
+
+  SPRITE 0 XYFLIP 0, 0 ' Not flipped
+  SPRITE 0 XYFLIP 1, 0 ' Flipped horizontally
+  SPRITE 0 XYFLIP 0, 1 ' Flipped vertically
+  SPRITE 0 XYFLIP 1, 1 ' Flipped horizontally and vertically

@@ -1,0 +1,5 @@
+====== OVERLOAD ======
+
+[pet] [vic20] [c64] [c16] [cplus4] [c128] [x16] [m65]
+
+The ''OVERLOAD'' keyword denotes that the subroutine or function overloads another one with the same name. See [[SUB]] and [[FUNCTION]] for details.

@@ -1,0 +1,30 @@
+====== FILTER ======
+
+[c64] [c128] [m65]
+
+Selects various sound filter properties.
+
+===== Syntax =====
+
+  FILTER [<sid_number>] <subcmd> [<subcmd> ...]
+
+  * ''<sid_number>'' is optional and defines on which SID chip the filter values should be set. If it isn't provided, it defaults to 1. This parameter is useful on multi-SID systems, for example a [c64] equipped with two SID chips, or the [m65] that has four SID chips. The number must be between 1 and 4.
+  * ''<subcmd>'' is one of:
+    * ''CUTOFF <cutoff_freq>'' - Filter cutoff frequency, a value between 0-2047
+    * ''RESONANCE <value>'' - Filter resonance setting, a value between 0-15 
+    * ''LOW|BAND|HIGH PASS''
+
+<adm note>
+Refer to the [[http://archive.6502.org/datasheets/mos_6581_sid.pdf|SID Data Sheet]] for explanation of all filter settings.
+</adm>
+===== Example =====
+
+  FILTER CUTOFF 900 RESONANCE 7 LOW PASS
+
+The filter can be applied to a particular voice using the [[VOICE]] command.
+
+===== See also =====
+
+  * [[SOUND_CLEAR]]
+  * [[VOICE]]
+  * [[VOLUME]]

@@ -1,0 +1,19 @@
+~~NOTOC~~ 
+
+====== ASC ======
+
+The ''ASC()'' function takes the first char of a string and returns its numeric PETSCII code. If an empty string is provided, the function will return 0.
+
+The inverse function of ''ASC()'' is ''[[v3:chr|]]''.
+
+===== Function Header =====
+
+  DECLARE FUNCTION ASC AS BYTE (char$ AS STRING) SHARED STATIC INLINE
+
+===== Examples =====
+
+  PRINT ASC("a") : REM will print 65
+  PRINT ASC("abc") : REM will print 65
+  PRINT ASC("") : REM will print 0
+ 
+

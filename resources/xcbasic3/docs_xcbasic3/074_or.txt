@@ -1,0 +1,11 @@
+====== OR ======
+
+[pet] [vic20] [c64] [c16] [cplus4] [c128] [x16] [m65]
+
+The ''OR'' operator performs a bitwise OR operation.
+
+===== Syntax =====
+
+  <operand> OR <operand>
+
+Both operands can be any type of numeric expression, except FLOAT.

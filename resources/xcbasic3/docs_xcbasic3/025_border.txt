@@ -1,0 +1,26 @@
+====== BORDER ======
+
+[v3.1] [vic20] [c64] [c16] [cplus4] [c128] [x16] [m65]
+
+Sets the border color.
+
+===== Syntax =====
+
+  BORDER <color>
+  BORDER <color>, <luminance>
+
+  * ''<color>'' is the color code. The accepted values are:
+    * 0 - 7 for [vic20]
+    * 0 - 15 for [c64] [c16] [cplus4] [c128]
+    * 0 - 31 for [m65]
+  * On the [c16] and [cplus4], both ''<color>'' and ''<luminance>'' values must be provided
+
+===== Examples =====
+
+  CONST BLACK = 0
+  CONST WHITE = 1
+  BORDER BLACK : BACKGROUND WHITE
+
+===== See also =====
+
+  * [[BACKGROUND]]

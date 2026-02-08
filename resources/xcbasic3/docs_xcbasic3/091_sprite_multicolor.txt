@@ -1,0 +1,16 @@
+====== SPRITE MULTICOLOR ======
+
+[c64] [c128] [m65]
+
+The ''SPRITE MULTICOLOR'' commands sets the two global color values that apply to all multicolor sprites.
+
+===== Syntax =====
+
+  SPRITE MULTICOLOR <col1>, <col2>
+
+Where <col1> and <col2> are expressions that evaluate to a number between 0 and 15.
+
+===== See also =====
+
+  * [[SPRITE]]
+

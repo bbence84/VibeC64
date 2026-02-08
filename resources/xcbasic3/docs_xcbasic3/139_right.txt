@@ -1,0 +1,20 @@
+====== RIGHT$ ======
+
+The ''RIGHT$()'' function returns the specified number of characters from the right side of a string.
+
+===== Syntax =====
+
+  RIGHT$(<input$>, <n>)
+
+<n> is the number of chars to be returned. If it is greater than the string length then the entire string will be returned.
+
+===== Example =====
+
+  DIM in$ AS STRING * 30
+  in$ = "xc=basic programming language"
+  PRINT RIGHT$(in$, 20) : REM outputs: programming language
+
+===== See also =====
+
+  * [[v3:left|]]
+  * [[v3:mid|MID$]]

@@ -1,0 +1,16 @@
+====== SGN ======
+
+The ''SGN()'' function returns the sign of a numerical argument as follows:
+
+^Argument^Result^
+|negative value|-1|
+|zero|0|
+|positive value (excluding zero)| 1|
+
+===== Function header =====
+
+  DECLARE FUNCTION SGN AS INT (num AS BYTE) SHARED STATIC INLINE
+  DECLARE FUNCTION SGN AS INT (num AS INT) OVERLOAD SHARED STATIC INLINE
+  DECLARE FUNCTION SGN AS INT (num AS WORD) OVERLOAD SHARED STATIC INLINE
+  DECLARE FUNCTION SGN AS INT (num AS LONG) OVERLOAD SHARED STATIC INLINE
+  DECLARE FUNCTION SGN AS INT (num AS FLOAT) OVERLOAD SHARED STATIC INLINE

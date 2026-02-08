@@ -1,0 +1,19 @@
+====== ERROR ======
+
+[pet] [vic20] [c64] [c16] [cplus4] [c128] [x16] [m65]
+
+The ''ERROR'' command triggers a runtime error. Errors can be trapped using the ''ON ERROR GOTO'' statement.
+
+===== Syntax =====
+
+  ERROR <error_code>
+
+Where <error_code> is a number between 0 and 255.
+
+===== See also =====
+
+  * [[v3:error_handling|]]
+
+
+
+

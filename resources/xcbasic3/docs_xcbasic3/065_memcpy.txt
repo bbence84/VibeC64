@@ -1,0 +1,25 @@
+====== MEMCPY ======
+
+[pet] [vic20] [c64] [c16] [cplus4] [c128] [x16] [m65]
+===== Syntax =====
+
+  MEMCPY <source_address>, <destination_address>, <length>
+  
+The ''MEMCPY'' command calls a built-in routine that copies //length// number bytes in memory from //source_address// to //destination_address//.
+
+
+<adm note>
+''MEMCPY'' uses fast Direct Memory Access (DMA) on the [m65].
+</adm>
+
+The routine is overlapping-safe **downwards only**. Use it if
+
+  * The source and destination ranges don't overlap, or
+  * The destination range is lower in memory
+
+For copying overlapping areas upwards, see ''[[memshift|MEMSHIFT]]''.
+
+===== See also =====
+
+  * [[MEMSET]]
+  * [[MEMSHIFT]]

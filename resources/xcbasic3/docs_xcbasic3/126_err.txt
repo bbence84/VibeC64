@@ -1,0 +1,4 @@
+====== ERR ======
+
+The ''ERR()'' function returns the code of the last emitted error. It can be used in an [[error_handling|error handling routine]].
+

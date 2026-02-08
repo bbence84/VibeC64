@@ -1,0 +1,22 @@
+====== HSCROLL ======
+
+[c64] [c16] [cplus4] [c128] [x16] [m65]
+
+Sets the horizontal smooth scrolling value.
+
+===== Syntax =====
+
+  ' On all Commodore platforms and the MEGA65:
+  HSCROLL <px>
+  ' On the Commander X16:
+  HSCROLL <layer>, <px> 
+
+  * On [c64] [c16] [cplus4] [c128] [m65], ''<px>'' is a value between 0 and 7. After this operation, the screen will be moved ''<px>'' pixels to the right.
+  * On the [x16], ''<layer>'' is a literal 0 or 1 specifying which layer to scroll. ''<px>'' is a value between 0 and 4095
+
+
+
+===== See also =====
+
+  * [[VSCROLL]]
+

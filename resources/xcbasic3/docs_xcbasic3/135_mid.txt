@@ -1,0 +1,22 @@
+====== MID$ ======
+
+The ''MID$()'' funcition returns //<length>// characters from a sring, starting from //<position>//.
+
+===== Syntax =====
+
+  MID$(<input$>, <position>,  <length>)
+
+<adm warning>
+ Unlike in CBM BASIC, the character position is zero-based, i. e. the first character's position is 0.
+</adm>
+
+===== Example =====
+
+  DIM in$ AS STRING * 30
+  in$ = "xc=basic programming language"
+  PRINT MID$(in$, 9, 11) : REM outputs: programming
+
+===== See also =====
+
+  * [[v3:left|]]
+  * [[v3:right]]

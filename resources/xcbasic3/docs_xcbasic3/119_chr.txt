@@ -1,0 +1,13 @@
+====== CHR$ ======
+
+The ''CHR$()'' function converts a number between 0 and 255 to its matching PETSCII character (as string).
+
+The inverse function of ''CHR$()'' is ''[[v3:asc|]]''.
+
+===== Function header =====
+
+  DECLARE FUNCTION CHR$ AS STRING (charcode AS BYTE) SHARED STATIC INLINE
+
+===== Examples =====
+
+  PRINT CHR$(147): REM clear the screen

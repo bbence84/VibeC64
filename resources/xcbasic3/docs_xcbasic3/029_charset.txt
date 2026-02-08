@@ -1,0 +1,64 @@
+====== CHARSET ======
+
+[v3.1] [vic20] [c64] [c16] [cplus4] [c128] [x16] [m65]
+
+The ''CHARSET'' command tells the display chip where to look for the character set. 
+
+ ===== Syntax =====
+
+  CHARSET [RAM|ROM] <value>
+
+Changing the character set is slightly different on each platform.
+
+====== Commodore 64 and 128 ======
+
+The command tells the VIC-II chip to look for the character set at ''<value> * $800'', relative to selected the VIC bank (that is, 0 by default). The ''RAM'' or ''ROM'' parameter is ignored. The VIC-II chip will always see the ROM when <value> is set to 2 or 3. The following example list all possible setups in Bank 0.
+
+  CHARSET 0 ' chars at $0000
+  CHARSET 1 ' chars at $0800
+  CHARSET 2 ' uppercase/graphic chars in ROM
+  CHARSET 3 ' lowercase/uppercase chars in ROM
+  CHARSET 4 ' chars at $2000
+  CHARSET 5 ' chars at $2800
+  CHARSET 6 ' chars at $3000
+  CHARSET 7 ' chars at $3800
+
+====== Commodore VIC-20 ======
+
+The address is calculated as ''<value> * $0400''. The VIC chip can either see ROM or RAM. It can't see the expansion RAM, therefore some settings make no sense. You basically have the following (more or less useful) options:
+
+  CHARSET ROM 0 ' uppercase with full graphic chars
+  CHARSET ROM 1 ' reversed uppercase and graphic chars
+  CHARSET ROM 2 ' lowercase/uppercase chars with some graphics
+  CHARSET ROM 3 ' reversed lowercase/uppercase chars with some graphics
+  CHARSET RAM 0 ' chars in RAM at $0000
+  CHARSET RAM 4 ' chars in RAM at $1000
+  CHARSET RAM 5 ' chars in RAM at $1400
+  CHARSET RAM 6 ' chars in RAM at $1800
+  CHARSET RAM 7 ' chars in RAM at $1C00
+
+====== Commodore 16 and Plus/4 ======
+
+The address is calculated as ''<value> * $0400''. The TED chip can basically see all RAM and ROM, so you have 128 possible settings here as <value> can range from 0 to 63 and both ''RAM'' and ''ROM'' settings work. 
+
+====== Commander X16 ======
+
+The [x16] supports the following modes:
+
+  ' Uploads the character set found 
+  ' at $2000 from RAM to VRAM and uses it
+  CHARSET RAM $2000
+  ' Sets ISO charset
+  CHARSET ROM 1
+  ' Sets PET upper/graph charset
+  CHARSET ROM 2
+  ' Sets PET lower/upper charset
+  CHARSET ROM 3
+
+====== MEGA65 ======
+
+On the [m65], the location of the character generator data can also be set with byte-level precision. The ''CHARAT'' command accepts a LONG integer as its parameter which allows the placement of character data anywhere in the first 16MB of RAM. The ''RAM'' or ''ROM'' parameter is ignored. 
+
+  ' Relocates character set to $040000
+  CHARSET $40000
+

@@ -1,0 +1,38 @@
+====== RANDOMIZE ======
+
+[pet] [vic20] [c64] [c16] [cplus4] [c128] [x16] [m65]
+
+The ''RANDOMIZE'' command seeds the pseudo-random generator with an initial value.
+
+===== Syntax =====
+
+  RANDOMIZE <value>
+
+The value given must be a LONG number and it will serve as a base for the random sequence.
+
+===== Example =====
+
+A typical use case is to seed the randomizer with the result of the [[TI]] function:
+
+  RANDOMIZE TI()
+  FOR i AS BYTE = 1 TO 10 : PRINT RND() : NEXT
+
+===== Commander X16 Example =====
+
+Since the ''TI()'' function is not implemented in the [x16], we'll use the ''ENTROPY()'' function, that is part of the X16.BAS library:
+
+  INCLUDE "x16.bas"
+  RANDOMIZE ENTROPY()
+  FOR i AS BYTE = 1 TO 10 : PRINT RND() : NEXT
+
+
+===== See also =====
+
+  * [[RND]]
+  * [[RNDB]]
+  * [[RNDI]]
+  * [[RNDW]]
+  * [[RNDL]]
+  * [[TI]]
+
+

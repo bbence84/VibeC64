@@ -1,0 +1,8 @@
+====== EXIT ======
+
+The ''EXIT'' keyword has multiple usages:
+
+  * ''EXIT DO'' exits a [[DO]] loop
+  * ''EXIT FOR'' exits a [[FOR]] loop
+  * ''EXIT FUNCTION'' exits a [[FUNCTION]]
+  * ''EXIT SUB'' exits a [[SUB]]

@@ -1,0 +1,14 @@
+====== CFLOAT ======
+
+The ''CFLOAT()'' function converts its argument to a floating point value.
+
+===== Function header =====
+
+  DECLARE FUNCTION CFLOAT AS FLOAT (number AS BYTE) SHARED STATIC INLINE
+  DECLARE FUNCTION CFLOAT AS FLOAT (number AS INT) OVERLOAD SHARED STATIC INLINE
+  DECLARE FUNCTION CFLOAT AS FLOAT (number AS WORD) OVERLOAD SHARED STATIC INLINE
+  DECLARE FUNCTION CFLOAT AS FLOAT (number AS LONG) OVERLOAD SHARED STATIC INLINE
+
+<adm note>
+To convert a string to floating point, see [[v3:val|]]
+</adm>

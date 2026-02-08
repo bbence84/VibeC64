@@ -1,0 +1,30 @@
+====== STR$ ======
+
+The ''STR$()'' function converts any type of numeric value into string.
+
+===== Function header =====
+
+  DECLARE FUNCTION STR$ AS STRING (number AS BYTE) SHARED STATIC INLINE
+  DECLARE FUNCTION STR$ AS STRING (number AS INT) OVERRIDE SHARED STATIC INLINE
+  DECLARE FUNCTION STR$ AS STRING (number AS WORD) OVERRIDE SHARED STATIC INLINE
+  DECLARE FUNCTION STR$ AS STRING (number AS LONG) OVERRIDE SHARED STATIC INLINE
+  DECLARE FUNCTION STR$ AS STRING (number AS FLOAT) OVERRIDE SHARED STATIC INLINE
+  DECLARE FUNCTION STR$ AS STRING (number AS DECIMAL) OVERRIDE SHARED STATIC INLINE
+  
+===== Examples =====
+
+  DIM msg$ AS STRING * 20
+  amount = 300
+  msg$ = "you have " + STR$(amount) + " points"
+
+<adm note>
+When converting a ''DECIMAL'' number to string, leading zeroes will also be included.
+</adm>
+
+  DIM a$ AS STRING * 4
+  a$ = STR$(99d)
+  PRINT a$ : REM will output 0099
+
+<adm warning>
+Converting numeric types to strings can take a considerable amount of CPU cycles. The only exception is the ''DECIMAL'' type that is very quickly converted to string. Consider using the ''DECIMAL'' type if you need to output numbers where speed is crucial.
+</adm>

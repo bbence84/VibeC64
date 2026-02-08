@@ -1,0 +1,28 @@
+====== VOLUME ======
+
+[vic20] [c64] [c16] [cplus4] [c128] [m65]
+
+Sets the master volume for all voices.
+
+===== Syntax =====
+
+  VOLUME [<sid_number>,] <volume>
+
+  * **<sid_number>** is optional and defines on which SID chip the filter values should be set. If it isn't provided, it defaults to 1. This parameter is useful on multi-SID systems, for example a C64 equipped with two SID chips, or the M65 that has four SID chips. The number must be between 1 and 4.
+  * **<volume>** is an expression that evaluates to a number between 0 and 15.
+
+===== Examples =====
+
+  ' Set maximum volume
+  VOLUME 15
+  ' Make SID #2 silent
+  VOLUME 2, 0
+
+<adm note>
+On [x16], volume for each voice can be set individually. See [[v3:voice#voice_volume|VOICE]].
+</adm>
+===== See also =====
+
+  * [[FILTER]]
+  * [[SOUND_CLEAR]]
+  * [[VOICE]]

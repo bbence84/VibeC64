@@ -1,0 +1,20 @@
+~~NOTOC~~ 
+
+====== ABS ======
+
+The ''ABS()'' function returns the absolute value of the passed numeric parameter.
+
+===== Function Header =====
+
+  DECLARE FUNCTION ABS AS BYTE (num AS BYTE) SHARED STATIC INLINE
+  DECLARE FUNCTION ABS AS INT (num AS INT) OVERLOAD SHARED STATIC INLINE
+  DECLARE FUNCTION ABS AS WORD (num AS WORD) OVERLOAD SHARED STATIC INLINE
+  DECLARE FUNCTION ABS AS LONG (num AS LONG) OVERLOAD SHARED STATIC INLINE
+  DECLARE FUNCTION ABS AS FLOAT (num AS FLOAT) OVERLOAD SHARED STATIC INLINE
+
+===== Examples =====
+
+  PRINT ABS(-1) : REM will print 1
+  PRINT ABS(1) : REM will print 1
+  n = -5400
+  PRINT ABS(n) : REM will print 5400

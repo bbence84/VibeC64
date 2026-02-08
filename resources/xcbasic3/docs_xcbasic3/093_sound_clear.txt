@@ -1,0 +1,17 @@
+====== SOUND CLEAR ======
+
+[vic20] [c64] [c16] [cplus4] [c128] [x16] [m65]
+
+Resets all voice registers.
+
+===== Syntax =====
+
+  SOUND CLEAR
+
+This is useful at parts of the programs to make sure that all sounds stop and all sound-related values are reset to original.
+
+===== See also =====
+
+  * [[VOICE]]
+  * [[VOLUME]]
+

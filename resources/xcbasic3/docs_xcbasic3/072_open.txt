@@ -1,0 +1,13 @@
+====== OPEN ======
+
+[vic20] [c16] [cplus4] [c64] [c128] [m65]
+
+The ''OPEN'' command opens a logical file.
+
+===== Syntax =====
+
+  OPEN <logical_no> [, <device_no> [, <secondary_address> [, <filename> ]]]
+
+<adm warning>
+File I/O commands are not implemented for the Commodore PET.
+</adm>

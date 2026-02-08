@@ -1,0 +1,60 @@
+====== OPTION ======
+
+The OPTION directive sets various compilation options. Most of these options can be set from the command line as well. The OPTION directive gets higher priority than command line options.
+
+===== Syntax =====
+
+  OPTION <option_name> [= <value>]
+
+<adm note>
+OPTION directives must precede any other commands in the program.
+</adm>
+
+===== Examples =====
+
+To set the target machine, use:
+
+  OPTION TARGET = "c128"
+
+Accepted values are:
+
+  * "c64" (Commodore-64)
+  * "vic20" (Commodore VIC-20 unexpanded)
+  * "vic20_3k" (Commodore VIC-20 with 3k RAM expansion)
+  * "vic20_8k" (Commodore VIC-20 with 8k RAM expansion)
+  * "cplus4" (Commodore Plus/4)
+  * "c16" (Commodore-16)
+  * "c128" (Commodore-128)
+  * "pet2001" (Commodore PET2001)
+  * "pet3008" (Commodore PET3000 series with 8k RAM)
+  * "pet3016" (Commodore PET3000 series with 16k RAM)
+  * "pet3032" (Commodore PET3000 series with 32k RAM)
+  * "pet4016" (Commodore PET4000 series with 16k RAM)
+  * "pet4032" (Commodore PET4000 series with 32k RAM)
+  * "pet8032" (Commodore PET8000 series)
+  * "x16" (Commander X16)
+  * "mega65" (MEGA65) 
+
+To disable the BASIC loader, use:
+
+  OPTION NOBASICLOADER
+
+If the above option is set, the compiled program will be a bare machine language binary that you can only run using the ''SYS'' command from CBM BASIC.
+
+To set the start address of the program, use:
+
+  OPTION STARTADDRESS = $C000
+
+This really makes sense when used together with ''OPTION NOBASICLOADER''.
+
+To enable inline data injection, use:
+
+  OPTION INLINEDATA
+
+See [[DATA]] for additional details.
+
+To use Fast Interrupts, use
+
+  OPTION FASTINTERRUPT
+
+See [[interrupts]] for more information.
