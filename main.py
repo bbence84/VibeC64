@@ -231,7 +231,7 @@ async def init_settings():
             Select(
                 id="LLMSelector",
                 label="LLM Model",
-                values=["Google Gemini 3.0 Flash Preview", "Google Gemini 3.0 Pro"], #,"Anthropic Claude 4.5 Sonnet", "Anthropic Claude 4.5 Opus", "OpenAI GPT-5", "OpenAI GPT-5.2"],
+                values=["Google Gemini 3.0 Flash Preview", "Google Gemini 3.0 Pro", "Ollama", "OpenRouter (Custom)"], #,"Anthropic Claude 4.5 Sonnet", "Anthropic Claude 4.5 Opus", "OpenAI GPT-5", "OpenAI GPT-5.2"],
                 initial_index=0,
             ),
             Switch(id="OpenRouter", label="Model access via OpenRouter", initial=False),
@@ -239,6 +239,14 @@ async def init_settings():
                 id="APIKey",
                 label="API Key",
                 placeholder="Enter your API key here"),
+            TextInput(
+                id="CustomModelName",
+                label="Custom Model Name (for Ollama or OpenRouter Custom)",
+                placeholder="e.g. llama3.2, google/gemini-2.0-flash-001"),
+            TextInput(
+                id="OllamaHost",
+                label="Ollama Host URL (if using Ollama)",
+                initial="http://localhost:11434"),
 
         ]).send()
     return settings
@@ -346,12 +354,20 @@ async def change_agent_settings(settings):
     llm_model = settings["LLMSelector"]
     api_key = settings["APIKey"]
     use_openrouter = settings["OpenRouter"]
+    custom_model = settings.get("CustomModelName")
+    ollama_host = settings.get("OllamaHost")
 
     llm_access_provider = cl.user_session.get("llm_access_provider")
 
-    if llm_access_provider and llm_model and api_key:
+    if llm_access_provider and llm_model and (api_key or llm_model == "Ollama"):
 
-        set_llm_success = llm_access_provider.set_llm_model(model_name=llm_model, api_key=api_key, use_openrouter=use_openrouter)
+        set_llm_success = llm_access_provider.set_llm_model(
+            model_name=llm_model,
+            api_key=api_key,
+            use_openrouter=use_openrouter,
+            custom_model=custom_model,
+            ollama_host=ollama_host
+        )
         if not set_llm_success:
 
             cl.user_session.set("model_init_success", False)

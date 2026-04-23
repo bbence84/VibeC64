@@ -18,6 +18,7 @@ class LLMAccessProvider:
                 "Anthropic Claude 4.5 Opus": ("anthropic/claude-opus-4.5", "openrouter"),
                 "OpenAI GPT-5": ("openai/gpt-5", "openrouter"),
                 "OpenAI GPT-5.2": ("openai/gpt-5.2", "openrouter"),
+                "OpenRouter (Custom)": ("custom", "openrouter"),
             }
         else:
             model_mapping = {
@@ -27,18 +28,26 @@ class LLMAccessProvider:
                 "Anthropic Claude 4.5 Opus": ("claude-opus-4-5", "anthropic"),
                 "OpenAI GPT-5": ("gpt-5", "openai"),
                 "OpenAI GPT-5.2": ("gpt-5.2", "openai"),
+                "Ollama": ("custom", "ollama"),
             }
         return model_mapping.get(model_name)
 
-    def set_llm_model(self, model_name=None,model_name_technical=None,model_provider=None, api_key=None, use_openrouter=False):
+    def set_llm_model(self, model_name=None,model_name_technical=None,model_provider=None, api_key=None, use_openrouter=False, custom_model=None, ollama_host=None):
         if model_name:
             model_name_mapped = self._map_model_name(model_name, use_openrouter=use_openrouter)
-            model_provider = model_name_mapped[1] if isinstance(model_name_mapped, tuple) else "google_genai"
-            self.model_name, self.model_provider = model_name_mapped if isinstance(model_name_mapped, tuple) else (model_name_mapped, "google_genai")
+            if model_name_mapped:
+                self.model_name, self.model_provider = model_name_mapped
+                if self.model_name == "custom" and custom_model:
+                    self.model_name = custom_model
+            else:
+                self.model_name = "gemini-3-flash-preview"
+                self.model_provider = "google_genai"
         else:
             self.model_name = model_name_technical
             self.model_provider = model_provider if model_provider else "google_genai"
+
         self.api_key = api_key
+        self.ollama_host = ollama_host
 
         try:
             self.llm_model = self.init_llm_model()
@@ -72,6 +81,11 @@ class LLMAccessProvider:
                     model_provider="google_genai", include_thoughts=False, thinking_level=thinking_level)
             elif self.model_provider == "anthropic":
                 return init_chat_model(streaming=streaming, model=self.model_name, api_key=self.api_key, model_provider="anthropic")
+            elif self.model_provider == "ollama":
+                base_url = self.ollama_host if self.ollama_host else "http://localhost:11434"
+                # Use OpenAI-compatible mode if available or direct Ollama provider
+                # langchain 0.2.12+ supports ollama via langchain-ollama, or we can use OpenAI adapter
+                return init_chat_model(streaming=streaming, model=self.model_name, base_url=f"{base_url}/v1", api_key="ollama", model_provider="openai")
             else:
                 raise ValueError(f"Unsupported model provider: {self.model_provider}")
         except Exception as e:
